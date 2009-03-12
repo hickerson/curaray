@@ -35,7 +35,7 @@ class Simulation // : Volume
 	vector<Source*> 	sources;    // sorces of particles
 	// TODO virtual Source source = 0; um... what?
 	vector<Path*>   	paths;		// the paths to render
-
+	
 public:
 	//Simulation();
 	//Simulation(const BoxVolume &_region, const Octree *_octree);

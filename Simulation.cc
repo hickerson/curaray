@@ -320,9 +320,11 @@ void Simulation::writeMathematicaGraphics(ofstream &math_file)
     // prep for drawing the paths
     math_file << "Graphics3D[{" << endl << "RGBColor[0,0,0]";
 
-#if 0
-     for (unsigned i = 0; i < neutron_count; i++)
-     {
+#if 1
+     //for (unsigned i = 0; i < neutron_count; i++)
+    vector<Path*>::iterator p;
+	for	(p = paths.begin(); p = paths.end(); p++)
+	{
         cout << "ploting path " << i << "...";
         // start path segments
         double last_time = start_time;
