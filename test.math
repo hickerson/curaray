@@ -1,0 +1,8 @@
+SetOptions[Plot,DisplayFunction->Identity]
+graphics = Show[
+,
+Graphics3D[{
+RGBColor[0,0,0] }], PlotRange -> {{-1, 6}, {0,1}, {-0.5, 3.5}}];
+Export["test.eps", graphics, ImageSize->600, ImageResolution->75]
+Exit[]
+Quit[]

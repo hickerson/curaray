@@ -1,0 +1,73 @@
+
+[executer]
+RunInTerminal=true
+
+[Project State]
+clean before build=false
+
+[filelist]
+0=/home/kevinh/Code/UCN/sim/Box.hh
+1=/home/kevinh/Code/UCN/sim/Volume.hh
+2=/home/kevinh/Code/UCN/sim/Event.hh
+3=/home/kevinh/Code/UCN/sim/InteractionEvent.hh
+4=/home/kevinh/Code/UCN/sim/AnnihilationEvent.hh
+5=/home/kevinh/Code/UCN/sim/IntersectionEvent.hh
+6=/home/kevinh/Code/UCN/sim/Geometry.hh
+7=/home/kevinh/Code/UCN/sim/Simulation.cc
+8=/home/kevinh/Code/UCN/sim/Sphere.hh
+9=/home/kevinh/Code/UCN/sim/Particle.cc
+10=/home/kevinh/Code/UCN/sim/Simulation.hh
+11=/home/kevinh/Code/UCN/sim/Source.hh
+12=/home/kevinh/Code/UCN/sim/Field.hh
+13=/home/kevinh/Code/UCN/sim/Makefile
+14=/home/kevinh/Code/UCN/sim/PathSegment.hh
+15=/home/kevinh/Code/UCN/sim/sim.cc
+
+[filenumbers]
+0=41
+1=34
+2=25
+3=1
+4=15
+5=15
+6=21
+7=95
+8=6
+9=83
+10=41
+11=46
+12=32
+13=6
+14=65
+15=52
+
+[filemarkers]
+0=
+1=
+2=
+3=
+4=
+5=
+6=
+7=
+8=
+9=
+10=
+11=
+12=
+13=
+14=
+15=
+
+[File View]
+filter.file.unmatch=*.so *.o *.a *.la
+filter.file.ignore.hidden=0
+filter.dir.ignore.hidden=0
+
+[Project Tree]
+0=0
+1=0:0
+2=0:1
+
+[File Tree]
+0=0

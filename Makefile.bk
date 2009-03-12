@@ -1,0 +1,30 @@
+all: ucnsim cpcspectrum sim
+
+COMMON_OBJECTS =
+Octree.o: Octree.cc Octree.hh
+Fields.o: Fields.cc Fields.hh
+loadSTL.o: loadSTL.cc loadSTL.hh
+MonteCarlo.o: MonteCarlo.cc MonteCarlo.hh
+GNUPlot.o: GNUPlot.cc GNUPlot.hh
+Particle.o: Particle.cc Particle.hh
+Source.o: Source.cc Source.hh
+Visualization.o: Visualization.cc Visualization.hh
+Graphics.o: Graphics.cc Graphics.hh
+Volume.o: Volume.cc Volume.hh
+Event.o: Event.cc Event.hh
+UCNEvent.o: UCNEvent.cc UCNEvent.hh
+Histogram.o: Histogram.cc Histogram.hh
+UCNeutron.o: UCNeutron.cc UCNeutron.hh
+Simulation.o: Simulation.cc Simulation.hh
+Surface.o: Surface.cc Surface.hh
+Geometry.o: Geometry.cc Geometry.hh
+CPCgeometry.o: CPCgeometry.cc CPCgeometry.hh
+
+cpcspectrum: cpcspectrum.o loadSTL.o Octree.o Fields.o GNUPlot.o MonteCarlo.o Particle.o Visualization.o Graphics.o Volume.o UCNEvent.o Event.o Histogram.o UCNeutron.o Simulation.o Surface.o Geometry.o CPCgeometry.o 
+	g++ -g -o cpcspectrum cpcspectrum.o loadSTL.o Octree.o Fields.o GNUPlot.o MonteCarlo.o Particle.o Visualization.o Graphics.o Volume.o Event.o UCNEvent.o Histogram.o UCNeutron.o Simulation.o Surface.o Geometry.o -lm
+
+sim: sim.o loadSTL.o Octree.o Fields.o GNUPlot.o MonteCarlo.o Particle.o Visualization.o Graphics.o Volume.o UCNEvent.o Event.o Histogram.o UCNeutron.o Simulation.o Surface.o Geometry.o CPCgeometry.o 
+	g++ -g -o sim sim.o loadSTL.o Octree.o Fields.o GNUPlot.o MonteCarlo.o Particle.o Visualization.o Graphics.o Volume.o Event.o UCNEvent.o Histogram.o UCNeutron.o Simulation.o Surface.o Geometry.o CPCgeometry.o -lm
+
+CFLAGS = -g
+CXXFLAGS = -g
