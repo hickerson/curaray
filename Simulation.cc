@@ -4,6 +4,7 @@
 #include "AnnihilationEvent.hh"
 #include "ContinuityEvent.hh"
 
+#include <iomanip>
 //Simulation::Simulation()
 //{
 //}
@@ -16,12 +17,19 @@
     //unsigned fields_count = 1;
 //}
 
-Simulation::Simulation(Volume *_volume) // TODO sould be Baoundary, not Volume
-	: volume(_volume)
+Simulation::Simulation(const Volume *_volume) 
+	: volume(_volume), earliest_time(0), latest_time(0)
 {
 	//addGeometry(volume);
     //unsigned max_depth = 1;
     //unsigned fields_count = 1;
+}
+
+Simulation::Simulation(const Volume *_volume, 
+					   double _earliest_time, 
+					   double _latest_time)
+	: volume(_volume), earliest_time(_earliest_time), latest_time(_latest_time)
+{
 }
 
 Simulation::~Simulation() {}
@@ -60,13 +68,9 @@ Pathlet* Simulation::advance(ParticleEvent *event)
 		{
 			double c[3] = {
 				event->get_position(axis), // TODO move outside
-				event->get_velocity(axis), // // TODO move outside
+				event->get_velocity(axis), // TODO move outside
 				0
 			};
-			/*
-			c[0] = event->get_position(axis); // TODO move outside
-			c[1] = event->get_velocity(axis); // // TODO move outside
-			c[2] = 0;*/
 			vector<Field*>::iterator f;
 			for (f = fields.begin(); f != fields.end(); f++)
 			{
@@ -82,10 +86,10 @@ Pathlet* Simulation::advance(ParticleEvent *event)
 		else if (degree < 2) // TODO check non negative 
 		{
 			double c[2];
-			c[1] = event->get_velocity(axis); // ... / m; // TODO move outside
+			c[1] = event->get_velocity(axis); // TODO move outside
 			c[0] = event->get_position(axis); // TODO move outside
-			if (c[1] == 0 )
-				exit(0);
+			//if (c[1] == 0 )
+			//	exit(0);
 			//pathlet->curve[axis] = polynomial(2, c);
 			p[axis] = polynomial(1,c);
 			cout << "advance["<<degree<<"]: " << p[axis] << endl;
@@ -127,7 +131,6 @@ int Simulation::run(double start_time, double stop_time, int count)
 //Path* Simulation::run(double start_time, double stop_time)
 bool Simulation::run(double start_time, double stop_time)
 {
-
 	// ...
 	
 	Path* path = 0;
@@ -185,7 +188,8 @@ bool Simulation::run(double start_time, double stop_time)
 	{
 		runs++;
 		cout << "runs " << runs << endl;
-		if (runs > 10) exit(0);
+		if (runs > 10) 
+			running = false;
 		Pathlet* pathlet = 0;
 		Geometry* geometry = 0;
 		InteractionEvent* interaction = 0;
@@ -308,70 +312,82 @@ void Simulation::addSource(Source *source)
 
 void Simulation::writeMathematicaGraphics(ofstream &math_file)
 {
-    // write the header
-    math_file << "SetOptions[Plot,DisplayFunction->Identity]" << endl;
-    math_file << "graphics = Show[" << endl;
- 
+	writeMathematicaGraphics(math_file, earliest_time, latest_time);
+}
+
+void Simulation::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
+{
     // write the stl file first
 //    stl_file->writeMathematicaGraphics(math_file);
     // TODO math_file << stl_file; XXX no endl at the end
-    math_file << "," << endl;
+    // math_file << "," << endl;
 
     // prep for drawing the paths
     math_file << "Graphics3D[{" << endl << "RGBColor[0,0,0]";
 
-#if 1
-     //for (unsigned i = 0; i < neutron_count; i++)
+	writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
+#if 0
+	const double frame_count = 1;
+	int i = 0; //for (unsigned i = 0; i < neutron_count; i++)
     vector<Path*>::iterator p;
-	for	(p = paths.begin(); p = paths.end(); p++)
+	for	(p = paths.begin(); p != paths.end(); p++)
 	{
-        cout << "ploting path " << i << "...";
-        // start path segments
+        cout << "ploting path " << i++ << "..."; 
+        Path* path = *p;
+		// start path segments
         double last_time = start_time;
-        if (ucn_path[i].visable())
-        {
+        //if (path.visable())
+        //{
 		for (int frame = 0; frame < frame_count; frame++)
         {
     	    const double frame_start_time = (stop_time - start_time) * (double)frame / (double)frame_count + start_time;
     	    const double frame_stop_time = (stop_time - start_time) * ((double)frame + 1) / (double)frame_count + start_time;
             math_file << "," << endl 
                       << setiosflags(ios::fixed) 
-                      << setprecision(8)
-                      << "Line[{";
+                      << setprecision(8);
+            math_file << "Line[{";
             // TODO write first point
             bool first_time = true;
-    	    for (double segment = 0; segment < segment_count; segment += 1.0)
+    	    double segment = 0; 
+    	    //for (double segment = 0; segment < segment_count; segment += 1.0)
+			double segment_count = path->pathlets.size();
+			vector<Pathlet*>::iterator s;
+			for (s = path->pathlets.begin(); s != path->pathlets.end(); s++)
     	    {
+				Pathlet* pathlet = *s;
     	        const double time = (stop_time - start_time)
                                   * (frame + segment / (segment_count - 1)) 
                                   / frame_count 
                                   + start_time;
+				segment += 1.0;
                 while (last_time < time or first_time)
                 {
                     double p[3];
-	    	    if (first_time)
+	    	    	if (first_time)
                     {
-       		        ucn_path[i].getPosition(time, p);
+       		        	path->getPosition(time, p);
                         last_time = time;
                     }
                     else
                     {
-            	        math_file[frame] << "," << endl;
-       		        last_time = ucn_path[i].getPosition(last_time, time, p);
+            	        //math_file[frame] << "," << endl;
+       		        	last_time = path->getPosition(last_time, time, p);
                     }
 			
-       		    math_file[frame] << "{" << p[0] << ", " << p[2] << ", " << p[1] << "}";
+       		    	//math_file[frame] << "{" << p[0] << ", " << p[2] << ", " << p[1] << "}";
+       		    	math_file << "{" << p[0] << ", " << p[2] << ", " << p[1] << "}";
                     first_time = false;
                 }
-	    }
-            math_file[frame] << "}]";
-        }
+	    	}
+            //math_file[frame] << "}]";
+            math_file << "}]";
+        //} // if visable
         }
         cout << "done." << endl;
      }
 #endif
 
-    // close Mathematica files
+    // end Show command Mathematica files
     math_file << " }], PlotRange -> {{-1, 6}, {0,1}, {-0.5, 3.5}}];" << endl;
     // TODO add range to Visulisation class
     //math_file << " }], PlotRange -> {{-.1, 4}, {0,1}, {-0.1, 3.1}}];" << endl;

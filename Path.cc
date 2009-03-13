@@ -355,3 +355,27 @@ unsigned Path::discontinuities()
 {
 	return _reflections;
 }
+
+void Path::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
+{
+	// determine starting pathlet
+	vector<Pathlet*>::iterator p;
+	for (p = pathlets.begin(); p != pathlets.end(); p++)
+	{
+		Pathlet* pathlet = *p;
+		//const double time = (stop_time - start_time)
+		//                  * (frame + segment / (segment_count - 1)) 
+		//                  / frame_count 
+		//                  + start_time;
+		//segment += 1.0;
+		pathlet->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
+		if (p != pathlets.end())
+			math_file << ", " << endl;
+	}
+}
+
+void Pathlet::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
+{
+	math_file << "ParametricPlot3D[{" << curve[0] << ", " << curve[1] << ", " << curve[2] << "}, ";
+	math_file << "{t, " << 0 << ", " << (stop_time - start_time) / scale << "}]";
+}

@@ -3,6 +3,9 @@
 
 #include <string>
 #include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <sstream>
 #include <vector>
 //#include "Pathlet.hh"
 #include "ParticleEvent.hh"
@@ -76,6 +79,7 @@ public:
     void noreflect();
 	void set(int axis, const polynomial &p);
 	double get_relative_max_time() {return 1;} // TODO replace with numerical stability calculation
+	void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time);
 };
 
  
@@ -116,6 +120,7 @@ public:
 
     //unsigned add(const Pathlet &_segment);
     unsigned discontinuities();
+	void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time);
 };
 
 

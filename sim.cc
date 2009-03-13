@@ -54,7 +54,14 @@ int main(int argc, char **argv)
 	*/
 	// new way ...
 	Box* box = new Box(-4, 4, -4, 4, -4, 4);
-	Simulation simulation(box);
+    // TODO will be part of the Simulation class
+    const unsigned neutron_count = 10;
+    //const unsigned segment_count = 3;
+    //const unsigned buffer_size = 1024;
+    const double start_time = 0;
+    const double stop_time = 10;
+	
+	Simulation simulation(box, start_time, stop_time);
 	
 	// add gravity
 	// old way ...
@@ -70,14 +77,6 @@ int main(int argc, char **argv)
 	ConstantForceField *gravity = new ConstantForceField(-9.80665,DOWN); // TODO fix 
 	simulation.addField(gravity);
 	
-    // TODO will be part of the Simulation class
-    const unsigned neutron_count = 10;
-    //const unsigned segment_count = 3;
-    //const unsigned buffer_size = 1024;
-    const double start_time = 0;
-    const double stop_time = 10;
-	
-   
     // TODO make ParticleSource
     // make all the neutrons
     // old way ...
@@ -181,33 +180,8 @@ int main(int argc, char **argv)
 	
 	// new way ...
 	simulation.run(start_time, stop_time, neutron_count);
-#if 0
-	double c[4] = {2,3.5,0,2};
-	double d[3] = {1,2,1};
-	polynomial p(3,c);
-	polynomial q(2,d);
-	cout << p << endl;
-	cout << q << endl;
-	cout << p.evaluate(2.1) << endl;
-	cout << p.derivative(2.1) << endl;
-	cout << q.evaluate(2.1) << endl;
-	cout << q.derivative(2.1) << endl;
-	
-	//q += p;
-	//p *= 2;
-	//q = p;
-	p = q;
-	cout << p << endl;
-	cout << q << endl;
-	cout << p.evaluate(2) << endl;
-	cout << p.derivative(2) << endl;
-	
-	cout << p.evaluate(2) << endl;
-	cout << p.derivative(2) << endl;
-	
-#endif	
 	// TODO save simulation to file
-	
+
 	// TODO will be part of the Visulation class
     const unsigned frame_count = 10;
     const double frame_start_time = 0;
@@ -223,12 +197,15 @@ int main(int argc, char **argv)
         exit(1);
     }
 	
+    // write the header
+    math_file << "SetOptions[Plot,DisplayFunction->Identity]" << endl;
+    math_file << "graphics = Show[" << endl;
+ 
 	simulation.writeMathematicaGraphics(math_file);
 	
 	math_file << "Export[\"" << base_filename << ".eps" << "\", graphics, "
               << "ImageSize->600, ImageResolution->75]" << endl;
-    math_file << "Exit[]" << endl;
-    math_file << "Quit[]" << endl;
+    //math_file << "Exit[]" << endl;
 
 #if 1
     // Execute mathematica file
