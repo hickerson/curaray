@@ -1,4 +1,6 @@
 all: sim
+clean: 
+	rm *.o *~ core sim
 
 CFLAGS = -g
 CXXFLAGS = -g

@@ -318,14 +318,22 @@ void Simulation::writeMathematicaGraphics(ofstream &math_file)
 void Simulation::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
 {
     // write the stl file first
-//    stl_file->writeMathematicaGraphics(math_file);
+	// stl_file->writeMathematicaGraphics(math_file);
     // TODO math_file << stl_file; XXX no endl at the end
     // math_file << "," << endl;
 
     // prep for drawing the paths
     math_file << "Graphics3D[{" << endl << "RGBColor[0,0,0]";
-
-	writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
+	int i = 0; //for (unsigned i = 0; i < neutron_count; i++)
+    vector<Path*>::iterator p;
+	for	(p = paths.begin(); p != paths.end(); p++)
+	{
+        Path* path = *p;
+        cout << "checking path " << i++ << "..."; 
+		path->check(0.00000001);
+		path->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
+	}
+	
 #if 0
 	const double frame_count = 1;
 	int i = 0; //for (unsigned i = 0; i < neutron_count; i++)

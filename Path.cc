@@ -45,7 +45,6 @@ Path::Path()
     _visable = false;
     _reflections = 0;
 }
-*/
 
 Path::~Path()
 {
@@ -54,6 +53,7 @@ Path::~Path()
     // TODO delete correctly 
 	//sample.clear();
 }
+*/
 
 /*
 Path::Path(const Path &copy)
@@ -100,6 +100,7 @@ Pathlet::Pathlet(Event* start, Event* stop, polynomial p[3])
 		curve[i] = p[i];
 }
 */
+
 void Pathlet::set(int axis, const polynomial &p)
 {
 	assert (axis < 3);
@@ -110,6 +111,7 @@ void Pathlet::getPosition(double time, double position[3]) const
 {
     assert(time >= start_time);
     assert(time <= stop_time);
+
     for (int i = 0; i < 3; i++)
 		position[i] = curve[i].evaluate((time - start_time)/scale);
 }
@@ -146,9 +148,9 @@ void Path::getPosition(double time, double position[3])
     assert(false);
 }
 
+/*
 double Path::getPosition(double start, double stop, double position[3])
 {
-/*
     assert(start >= start_time);
     assert(start < stop_time);
     assert(stop > start_time);
@@ -170,12 +172,12 @@ double Path::getPosition(double start, double stop, double position[3])
     cerr << "start = " << start << " stop = " << stop << endl;
     cerr << "start_time = " << start_time << " stop_time = " << stop_time << endl;
     assert(false);
-*/
 }
+*/
 
+/*
 double Path::getMaximum(double start, double stop, const double direction[3])
 {
-	/*
     //if (start < start_time) 
     if (not (start < stop_time)) 
     {
@@ -220,22 +222,27 @@ double Path::getMaximum(double start, double stop, const double direction[3])
 	i++;
     }
     return maximum;
-	*/
 }
+*/
 
 // tests a particle paths continuity
 // reports number of errors
 int Path::check(double epsilon)
 {
-	/*
     int error_count = 0;
     double last_position[3];
     double position[3];
     double last_time;
-    for (int i = 0; i < count; i++)
+    //for (int i = 0; i < count; i++)
+    int i = 0;
+	vector<Pathlet*>::iterator p;
+	for (p = pathlets.begin(); p != pathlets.end(); p++)
     {
-        double start = sample[i].start_time;
-	sample[i].getPosition(start, position);
+		Pathlet* pathlet = *p;
+        //double start = sample[i].start_time;
+        double start = pathlet->start_time;
+		//sample[i].getPosition(start, position);
+		pathlet->getPosition(start, position);
         if (i == 0)
         {
             if (start != start_time)
@@ -286,10 +293,12 @@ int Path::check(double epsilon)
             }
         }
 
-        double stop = sample[i].stop_time;
-	sample[i].getPosition(stop, last_position);
-        if (i == count)
-        //if (i == sample.size())
+        //double stop = sample[i].stop_time;
+        double stop = pathlet->stop_time;
+		//sample[i].getPosition(stop, last_position);
+		pathlet->getPosition(stop, last_position);
+        //if (i == count)
+        if (i == pathlets.size())
         {
             if (stop != stop_time)
             {
@@ -310,7 +319,6 @@ int Path::check(double epsilon)
              << "Fix these first. " << endl;
     }
     return error_count;
-*/
 }
 
 void Path::show()
