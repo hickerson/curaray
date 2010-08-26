@@ -5,6 +5,8 @@
 #include <iostream>
 #include "Surface.hh"
 
+#define dot(u,v)  (u[0]*v[0]+u[1]*v[1]+u[2]*v[2])
+
 using namespace std;
 
 /**
@@ -26,6 +28,7 @@ public:
 		normal[axis] = 1;
 		for (int i=1; i < 2; i++)
 			center[(axis + i)%3] = 0;
+		nc = 0;
 	}
 	
 	// defaults to passing through the origin
@@ -51,9 +54,14 @@ public:
 	
 	~Plane();
 
-	// this doens't belong here because it a plane is not compact
+public:
+	// TODO this doesn't belong here because an infinite plane is not compact
 	double* get_random_point(double time) const;
+
 	InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const;
+	InteractionEvent* selfinteract(Pathlet* pathlet, double start_time, double stop_time) const;
+	void writeMathematicaGraphics(ofstream & of);
+	void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_time);
 };
 
 #endif

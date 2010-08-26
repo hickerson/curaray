@@ -28,7 +28,7 @@ void randomDiskVector(double disk[3], double r)
     { // this fails half the time exactly. Ummm... try 1-pi/4!
         for (unsigned i = 0; i < 2; i++)
 	    disk[i] = 2*randomInterval() - 1;
-	norm = sqrt(disk[0] * disk[0]
+		norm = sqrt(disk[0] * disk[0]
 	  	  + disk[1] * disk[1]);
     }
     for (unsigned i = 0; i < 2; i++)

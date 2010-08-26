@@ -6,6 +6,8 @@
 #include "Event.hh"
 #include "Particle.hh"
 
+#define dot(u,v)  (u[0]*v[0]+u[1]*v[1]+u[2]*v[2])
+
 using namespace std;
 
 /**
@@ -67,6 +69,14 @@ public:
 	{
 		for (int i=0; i<3; i++)
 			position[i] = x[i];
+	}
+
+	// TODO move to SurfaceMap?
+	void reflect_velocity(const double normal[3])
+	{ 
+    	double vn = dot(velocity, normal);
+    	for (unsigned i = 0; i < 3; i++)
+    		velocity[i] -= 2*vn*normal[i];
 	}
 };
 

@@ -3,7 +3,7 @@
 
 //#include <string>
 //#include <iostream>
-#include "Volume.hh"
+#include "Solid.hh"
 
 //using namespace std;
 
@@ -16,7 +16,7 @@
  * Author: Kevin Peter Hickerson
  * Date:   March 2, 2009
  */
-class Box : public Volume
+class Box : public Solid
 {
 	//double x[3][2];
 	double x_min, x_max;
@@ -37,7 +37,10 @@ class Box : public Volume
 	~Box() {}
 		
 	InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const;
+	InteractionEvent* selfinteract(Pathlet* pathlet, double start_time, double stop_time) const;
 	double* get_random_point(double time) const;
+	void writeMathematicaGraphics(ofstream & of);
+	void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop);
 };
 
 #endif

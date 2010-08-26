@@ -1,26 +1,26 @@
-#pragma once 
-#ifndef __class_Geometry_hh__
-#define __class_Geometry_hh__
+#ifndef __class_Cell_hh__
+#define __class_Cell_hh__
 
 #include <string>
 #include <iostream>
 #include "InteractionEvent.hh" 
 #include "Path.hh"
+
 using namespace std;
 
-typedef int dimension;
-typedef int codimension;
 class InteractionEvent;
 
 /**
- * Geometry
+ * Cell
  *
  * Author: Kevin Peter Hickerson
- * Modified: Aug 24, 2010
  */
-//template <dimension k>
-class Geometry
+class Cell
 {
+public:
+	Cell() {};
+	~Cell() {};
+
 public: 
 	virtual InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const = 0;
 	virtual InteractionEvent* selfinteract(Pathlet* pathlet, double start_time, double stop_time) const = 0;

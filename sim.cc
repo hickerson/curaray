@@ -11,12 +11,14 @@
 #include <sstream>
 #include "MonteCarlo.hh"
 //#include "Visualization.hh"
-#include "Volume.hh"
-#include "Box.hh"
+//#include "Volume.hh"
+//#include "Solid.hh"
+//#include "Box.hh"
 #include "Field.hh"
 #include "Simulation.hh"
 #include "Sphere.hh"
 #include "Plane.hh"
+#include "Interval.hh"
 
 using namespace std;
 
@@ -24,7 +26,7 @@ using namespace std;
 // TODO make ParticleSource
 
 #define MULTIPLE_MATHEMATICA_FILES 	0
-#define DOWN 						1
+#define DOWN 						2
 #define DIM							3
 
 int main(int argc, char **argv)
@@ -53,13 +55,15 @@ int main(int argc, char **argv)
 		  max_depth);
 	*/
 	// new way ...
-	Box* box = new Box(-4, 4, -4, 4, -4, 4);
+	//Box* box = new Box(-4, 4, -4, 4, -4, 4);
+	double simulation_bounds[6] = {-4, 4, -4, 4, -4, 4};
+	Interval<3>* box = new Interval<3>(simulation_bounds); // TODO make 4D
     // TODO will be part of the Simulation class
-    const unsigned neutron_count = 10;
+    const unsigned neutron_count = 100;
     //const unsigned segment_count = 3;
     //const unsigned buffer_size = 1024;
     const double start_time = 0;
-    const double stop_time = 10;
+    const double stop_time = 4;
 	
 	Simulation simulation(box, start_time, stop_time);
 	
@@ -101,15 +105,15 @@ int main(int argc, char **argv)
 	double neutron_mass = 10.454077; //neV s^2/m^2
 	double neutron_energy = 250; // neV
 	double neutron_momentum = sqrt(2*neutron_mass*neutron_energy);
-	Sphere* sphere = new Sphere(center, 0.5);
-	Sphere* four_pi = new Sphere(zero, neutron_momentum);
+	Sphere<2>* position_sphere = new Sphere<2>(center, 0.5);
+	Sphere<2>* momentum_sphere = new Sphere<2>(zero, neutron_momentum);
 	PowerLawSpectrum* spectrum = new PowerLawSpectrum(3/2, 350, 0, 70);
 	Particle* neutron = new Particle(neutron_mass, 0, 1/886.3);
-	Source* source = new Source(sphere, four_pi, spectrum, neutron);
+	Source* source = new Source(position_sphere, momentum_sphere, spectrum, neutron);
 	simulation.addSource(source);
 	
-	double ground_normal[3] = {0,1,0};
-	double ground_center[3] = {0,-1,0};
+	double ground_normal[3] = {0,0,1.0};
+	double ground_center[3] = {0,0,-1.0};
 	Plane* ground = new Plane(ground_normal, ground_center);
 	simulation.addGeometry(ground);
 	
@@ -199,20 +203,19 @@ int main(int argc, char **argv)
 	
     // write the header
     math_file << "SetOptions[Plot,DisplayFunction->Identity]" << endl;
-    math_file << "graphics = Show[" << endl;
- 
+    math_file << "graphics = " << endl;
 	simulation.writeMathematicaGraphics(math_file);
-	
-	math_file << "Export[\"" << base_filename << ".eps" << "\", graphics, "
+	//math_file << "Export[\"" << base_filename << ".eps" << "\", graphics, "
+	math_file << "Export[\"" << base_filename << ".gif" << "\", graphics, "
               << "ImageSize->600, ImageResolution->75]" << endl;
-    //math_file << "Exit[]" << endl;
+    math_file << "Exit[]" << endl;
 
 #if 1
     // Execute mathematica file
     cout << "serching in path " << getenv("PATH") << endl;
     cout << "Mathematica:" << endl;
     string s = "math -noprompt -run \"<<" + base_filename + ".math" + "\"";
-    cout << "Mathematica returned " << system(s.c_str()) << endl;
+	cout << "Mathematica returned " << system(s.c_str()) << endl;
     // TODO sys << "math -noprompt -run \"<<" << base_filename << "\"" << execute;
     // TODO if (sys.error())
     // TODO     cerr << "Mathematica returned " << sys.error() << endl;

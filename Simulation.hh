@@ -6,44 +6,45 @@
 #include <fstream>
 //#include "Octree.hh"
 #include "ParticleEvent.hh"
-#include "Volume.hh"
+//#include "Volume.hh"
+//#include "Solid.hh"
 #include "Source.hh"
 #include "Field.hh"
 #include "Path.hh"
+#include "CellularComplex.hh"
 
 using namespace std;
 
 //typedef vector<VectorField*> VectorFieldTable;
 //typedef vector<Surface*> SurfaceTable;
+typedef CellularComplex<3> Solid;
 
 /**
  * Simulation
  *
  * Author: Kevin Peter Hickerson
  */
- 
- 
 class Simulation // : Volume
 {
-	double 				earliest_time; 	// the earliest time boundary of the simulation
-	double 				latest_time;  	// the latest time boundary of the simulation
-	const Volume* 		volume;     	// the volume on which the simulation is valid
-    //const Volume volume;          	// the volume on which the simulation is valid
+	double 				earliest_time; 	/// the earliest time boundary of the simulation
+	double 				latest_time;  	/// the latest time boundary of the simulation
+	//const Volume* 		volume;     	/// the volume on which the simulation is valid
+    const Solid* volume;          		/// the volume on which the simulation is valid
 	//Octree *octree;
-	//vector<Surface*> surfaces;   		// surfaces that are not boundaries of volumes
-	//vector<Volumes*> volumes;     	// volumes with surfaces boundaries 
+	//vector<Surface*> surfaces;   		/// surfaces that are not boundaries of volumes
+	//vector<Volumes*> volumes;     	/// volumes with surfaces boundaries 
 
-	vector<Field*> 		fields;     	// fields that interact with particles
-	vector<Geometry*> 	geometries; 	// geometries that interact with particles
-	vector<Source*> 	sources;    	// sorces of particles
-	vector<Path*>   	paths;			// the paths of simulated particles
+	vector<Field*> 		fields;     	/// fields that interact with particles
+	vector<Geometry*> 	geometries; 	/// geometries that interact with particles
+	vector<Source*> 	sources;    	/// sorces of particles
+	vector<Path*>   	paths;			/// the paths of simulated particles
 	
 public:
 	//Simulation();
 	//Simulation(const BoxVolume &_region, const Octree *_octree);
 	//Simulation(const Volume &_volume); // this doesn't work because volume is abstract
-	Simulation(const Volume *_volume);
-	Simulation(const Volume *_volume, double _start_time, double _stop_time);
+	Simulation(const Solid *_volume);
+	Simulation(const Solid *_volume, double _start_time, double _stop_time);
 	~Simulation();
 	
 	void addField(Field *field);

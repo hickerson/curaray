@@ -17,7 +17,8 @@
     //unsigned fields_count = 1;
 //}
 
-Simulation::Simulation(const Volume *_volume) 
+
+Simulation::Simulation(const Solid *_volume) 
 	: volume(_volume), earliest_time(0), latest_time(0)
 {
 	//addGeometry(volume);
@@ -25,7 +26,7 @@ Simulation::Simulation(const Volume *_volume)
     //unsigned fields_count = 1;
 }
 
-Simulation::Simulation(const Volume *_volume, 
+Simulation::Simulation(const Solid *_volume, 
 					   double _earliest_time, 
 					   double _latest_time)
 	: volume(_volume), earliest_time(_earliest_time), latest_time(_latest_time)
@@ -80,36 +81,31 @@ Pathlet* Simulation::advance(ParticleEvent *event)
 			}
 			
 			p[axis] = polynomial(2,c);
-			cout << "advance["<< degree<<"]: " << p[axis] << endl;
+			//cout << "advance[" << degree << "]: " << p[axis] << endl;
 			// ...
 		}
 		else if (degree < 2) // TODO check non negative 
 		{
 			double c[2];
-			c[1] = event->get_velocity(axis); // TODO move outside
 			c[0] = event->get_position(axis); // TODO move outside
+			c[1] = event->get_velocity(axis); // TODO move outside
 			//if (c[1] == 0 )
 			//	exit(0);
 			//pathlet->curve[axis] = polynomial(2, c);
 			p[axis] = polynomial(1,c);
-			cout << "advance["<<degree<<"]: " << p[axis] << endl;
+			//cout << "advance[" << degree << "]: " << p[axis] << endl;
 			// ...
 		}
 		else
 		{
 			// TODO support polynomial fields with direct integration
 			// TODO support 
-			cerr << "higher degrees notsuported yet" << endl;
+			cerr << "higher degrees not supported yet" << endl;
 			return 0;
 		}
 		// TODO look for any other solution type
-		//pathlet->set(axis, p);
 	}
 	
-	// ...
-	// TODO make an end event
-	//ContinuityEvent* continuity_event = new ContinuityEvent(
-	//Pathlet* pathlet = 0;
 	return new Pathlet(p);
 }
 	
@@ -131,8 +127,6 @@ int Simulation::run(double start_time, double stop_time, int count)
 //Path* Simulation::run(double start_time, double stop_time)
 bool Simulation::run(double start_time, double stop_time)
 {
-	// ...
-	
 	Path* path = 0;
 	Source* source = 0;	
 	
@@ -154,55 +148,64 @@ bool Simulation::run(double start_time, double stop_time)
 		source = *s; // TODO fix this hack (only work with one source)
 	}
 	
-	
 	//Particle* particle = source->get_new_particle(start_time, stop_time);
 	CreationEvent* start_event = 0;
-	if (source) 
-		start_event = source->create(start_time, stop_time);
-	else
+	if (not source) 
 	{
 		// TODO throw error ?
 		cerr << "no sources found" << endl;
 		return false;
 	}
+
+	start_event = source->create(start_time, stop_time);
 	
-	if (start_event) {
-		path = new Path(start_event); // TODO add args
-		//paths.push_back(path);
-	}	
-	else
+	if (not start_event)
 	{
+		// TODO throw error ?
 		cerr << "no creation event" << endl;
 		return false;
-		//return NULL; // TODO throw error
 	}
+
+	ParticleEvent* event = start_event;
+	path = new Path(event); // TODO add args
+	cout << "setting path start time to " << event->get_time() << " sec" << endl;
 	paths.push_back(path);
 	
-	// TODO Geometry* last_geometry = source->getGeometry();
-	// TODO while (start_time < t < stop_time)	
-	ParticleEvent* event = start_event;
+	// TODO Geometry* last_geormetry = source->getGeometry();
+	Geometry* last_geormetry = source->geometry;
 	
+	// TODO while (start_time < t < stop_time)	
 	int runs = 0;
 	bool running = true;
 	while (running)
 	{
 		runs++;
 		cout << "runs " << runs << endl;
-		if (runs > 10) 
-			running = false;
+		if (runs > 100) 
+			abort();
 		Pathlet* pathlet = 0;
 		Geometry* geometry = 0;
-		InteractionEvent* interaction = 0;
+		InteractionEvent* best_interaction = 0;
 		
 		// ...
 		
 		// TODO? use solver: pathlet = solver->solve_path(prev_event);
 		pathlet = advance(event);
+		if (!pathlet)
+		{
+			// TODO throw error?
+			cerr << "can't identify next event." << endl;
+			return false;
+		}
+
 		//double max_time = pathlet->stop_time; // wrong! not set yet
-		double max_time = event->get_time() + pathlet->get_relative_max_time();
+		double min_time = event->get_time();
+		double max_time = min_time + pathlet->get_relative_max_time();
 		
-		cout << "max_time " << max_time << endl;
-		cout << "stop_time " << stop_time << endl;
+		cout << "event->get_time() = " << event->get_time() << endl;
+		cout << "pathlet->get_relative_max_time() = " << pathlet->get_relative_max_time() << endl;
+		cout << "max_time = " << max_time << endl;
+		cout << "stop_time = " << stop_time << endl;
 		
 		// check we are within the time interval
 		event = 0;
@@ -213,32 +216,37 @@ bool Simulation::run(double start_time, double stop_time)
 			running = false;
 			event->out_of_bounds = true;
 			max_time = stop_time;
-			cout << "found end time" << endl;
+			cout << "found end time " << max_time << " sec." << endl;
 		}
 		
-		// iterate through geometries
+		// TODO handle decay events
+		// TODO handle other loss events
+		// ...
+		
+		// iterate through geometries and look for interaction events
 		vector<Geometry*>::iterator g;
 		for (g = geometries.begin(); g != geometries.end(); g++)
 		{
-			cout << "found an interactable geometry" << endl;
-			//double t = (*g)->interact(pathsegment, min_time);
-			interaction = (*g)->interact(pathlet, start_time, max_time);
+			//cout << "found an interactable geometry" << endl;
+			InteractionEvent* interaction = 0;
+			Geometry* this_geometry = *g;
+			//if (this_geometry == last_geormetry)
+			//	interaction = this_geometry->selfinteract(pathlet, min_time, max_time);
+			//else
+				interaction = this_geometry->interact(pathlet, min_time, max_time);
+
 			if (interaction)
 			{
-				cout << "found interaction" << endl;
 				double t = interaction->get_time(); // TODO make sure this is computed relatively
+				cout << "Found interaction event at time " << t << " in window " << min_time << " to " << max_time << endl;
 				if (t < max_time) // look for shortest time
 				{
 					cout << "found closest interaction" << endl;
 					max_time = t;
-					geometry = *g;
+					geometry = this_geometry;
 					delete event;
 					event = interaction;
-					for (int i = 0; i < 3; i++)
-					{
-						event->position[i] = pathlet->curve[i].evaluate(max_time);
-						event->velocity[i] = pathlet->curve[i].derivative(max_time);
-					}
+					best_interaction = interaction;
 				}
 				else
 					delete interaction;
@@ -247,42 +255,60 @@ bool Simulation::run(double start_time, double stop_time)
 		
 		// TODO add volume to geometry list?
 		// check bounding volume last 
-		interaction = volume->interact(pathlet, start_time, max_time);
-		if (interaction) 
+		InteractionEvent* out_of_bounds = volume->interact(pathlet, min_time, max_time);
+		if (out_of_bounds) 
 		{
 			cout << "out of bounds" << endl;
-			event = interaction;
+			delete event;
+			event = out_of_bounds;
 			event->out_of_bounds = true;
 			max_time = event->get_time();
 			running = false;
 		}
 		
-		// TODO handle decay events
-		// TODO handle other loss events
-		// ...
-		
-		// no better intersection found? 
-		if (!event)
+		if (not event)
 		{
+			// no better intersection found? 
 			cout << "continuity." << endl;
 			event = new ContinuityEvent(max_time);
+			// TODO compute new position and velocity in public function 
 			for (int i = 0; i < 3; i++)
 			{
-				event->position[i] = pathlet->curve[i].evaluate(max_time);
-				event->velocity[i] = pathlet->curve[i].derivative(max_time);
+				event->position[i] = pathlet->curve[i].evaluate(max_time - min_time);
+				event->velocity[i] = pathlet->curve[i].derivative(max_time - min_time);
 			}
-			// TODO compute new position and velocity
+			if (event->position[2] > 1.5)
+			{
+				cerr << "found odd continuity" << endl;
+				abort();
+			}
+			running = true;
+			delete best_interaction;
 		}
-		
-		if (pathlet)
+		else if (event == best_interaction)
 		{
-			cout << "appending" << endl; 
-			path->append(pathlet, event);
+			// TODO compute new position and velocity in public function 
+			for (int i = 0; i < 3; i++)
+			{
+				event->position[i] = pathlet->curve[i].evaluate(max_time - min_time);
+				event->velocity[i] = pathlet->curve[i].derivative(max_time - min_time);
+			}
+			//if (event->position[2] < 1.5 and event->position[2] > 0.5)
+			if (event->position[2] > 0.0)
+			{
+				cerr << "found odd interaction" << endl;
+				abort();
+			}
+			event->reflect_velocity(best_interaction->normal);
+			running = true;
 		}
-		else
+
+		path->append(pathlet, event);
+		int err_count = path->check(0.01);
+		if (err_count)
 		{
-			// TODO throw error("unable to solve path");
-			cerr << "can't identify next event." << endl;
+			// TODO throw error?
+			cerr << "error appending new event to path" << endl;
 			return false;
 		}
 	}
@@ -317,23 +343,37 @@ void Simulation::writeMathematicaGraphics(ofstream &math_file)
 
 void Simulation::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
 {
-    // write the stl file first
-	// stl_file->writeMathematicaGraphics(math_file);
-    // TODO math_file << stl_file; XXX no endl at the end
-    // math_file << "," << endl;
+	math_file << "Show[" << endl;
 
-    // prep for drawing the paths
-    math_file << "Graphics3D[{" << endl << "RGBColor[0,0,0]";
-	int i = 0; //for (unsigned i = 0; i < neutron_count; i++)
+    vector<Source*>::iterator s;
+	for	(s = sources.begin(); s != sources.end(); s++)
+	{
+        Geometry* geometry = (*s)->geometry;
+		geometry->writeMathematicaGraphics(math_file, start_write_time, start_write_time);
+		math_file << ", " << endl;
+	}
+
+    vector<Geometry*>::iterator g;
+	for	(g = geometries.begin(); g != geometries.end(); g++)
+	{
+        Geometry* geometry = *g;
+		geometry->writeMathematicaGraphics(math_file, start_write_time, start_write_time);
+		math_file << ", " << endl;
+	}
+
     vector<Path*>::iterator p;
 	for	(p = paths.begin(); p != paths.end(); p++)
 	{
         Path* path = *p;
-        cout << "checking path " << i++ << "..."; 
-		path->check(0.00000001);
 		path->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
+		math_file << ", " << endl;
 	}
-	
+
+    math_file << "PlotRange -> {{-3, 3}, {-3,3}, {-3, 3}}" << endl;
+	math_file << "]" << endl;
+}
+// TODO add range to Visulisation class?
+
 #if 0
 	const double frame_count = 1;
 	int i = 0; //for (unsigned i = 0; i < neutron_count; i++)
@@ -393,11 +433,9 @@ void Simulation::writeMathematicaGraphics(ofstream &math_file, double start_writ
         }
         cout << "done." << endl;
      }
-#endif
 
     // end Show command Mathematica files
-    math_file << " }], PlotRange -> {{-1, 6}, {0,1}, {-0.5, 3.5}}];" << endl;
-    // TODO add range to Visulisation class
     //math_file << " }], PlotRange -> {{-.1, 4}, {0,1}, {-0.1, 3.1}}];" << endl;
     //math_file << " }], PlotRange -> {{4, 6}, {0,1}, {-0.5, 3.5}}];" << endl;
 }
+#endif

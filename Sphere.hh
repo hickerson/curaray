@@ -3,20 +3,20 @@
 
 #include <string>
 #include <iostream>
-#include "Surface.hh"
+#include "CellularComplex.hh"
 
 using namespace std;
 
 /**
- * Sphere
+ * k-Sphere
  *
  * Author: Kevin Peter Hickerson
  */
-//class Sphere : Boundary
-class Sphere : public Surface
+template <dimension k>
+class Sphere : public CellularComplex<k> 
 {
 	double radius;
-	double center[3];
+	double center[k+1];
 	
 public:
 	Sphere() // unit sphere
@@ -26,10 +26,10 @@ public:
 			center[i] = 0;
 	}
 	
-	Sphere(double _center[3], double _radius) 
+	Sphere(double _center[k+1], double _radius) 
 	: radius(_radius)
 	{
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < k+1; i++)
 			center[i] = _center[i];
 	}
 	
@@ -37,6 +37,47 @@ public:
 
 	double* get_random_point(double time) const;
 	InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const;
+	InteractionEvent* selfinteract(Pathlet* pathlet, double start_time, double stop_time) const;
+	void writeMathematicaGraphics(ofstream & of);
+	void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop);
 };
 
+
+template <dimension k>
+InteractionEvent* Sphere<k>::interact(Pathlet* pathlet, double start_time, double stop_time) const
+{
+	return NULL;
+}
+
+
+template <dimension k>
+InteractionEvent* Sphere<k>::selfinteract(Pathlet* pathlet, double start_time, double stop_time) const
+{
+	return NULL;
+}
+
+template <dimension k>
+double* Sphere<k>::get_random_point(double time) const 
+{
+	double* p = new double[k+1];
+	//randomSphereVector(p, radius);
+	for (int i = 0; i < k+1; i++)
+		p[i] += center[i];
+	return p;
+}
+
+template <dimension k>
+void Sphere<k>::writeMathematicaGraphics(ofstream & math_file) 
+{
+	math_file << "Graphics3D[ {Red, Opacity[0.3], "
+			  << "Sphere [{" << center[0] << ", " << center[1] << ", " << center[2] << "}, "  << radius << "]";
+	math_file << "}]";
+}
+
+// TODO StaticGeometry class?
+template <dimension k>
+void Sphere<k>::writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop)
+{
+	writeMathematicaGraphics(math_file);
+}
 #endif

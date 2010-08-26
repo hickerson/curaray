@@ -79,7 +79,7 @@ public:
 			value = _c[n] + t * value;
         	//value *= t;
 			//value += _c[n];
-			cout << "n=" << n <<endl;
+			//cout << "n=" << n <<endl;
 		}
 		return value;
 	}

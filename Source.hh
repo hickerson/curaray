@@ -47,6 +47,7 @@ public:
 
 class Source
 {
+public:
     Geometry *geometry; // the spacial geometry of this source
 	Geometry *momentum; // the momentum gemometry in phase space
     Spectrum *spectrum; // the energy spectrum of this source
