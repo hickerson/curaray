@@ -11,17 +11,19 @@ using namespace std;
  *
  * Author: Kevin Peter Hickerson
  */
-class Axis : public CellularComplex<1>
+template <dimension n = 3>
+class Axis : public CellularComplex<1,n-1>
 {
 	bool infinte;
-	bool contruction;
-	//{ Point *point[2]; | Axis *axis; };
+	bool for_contruction;
+	//{ Point *point[2]; | CellularComplex<1,n-1>* other_axis; };
 
 public:
 	Axis() {};
 	~Axis() {};
 
 public: 
+/*
 	Axis* getComponent(CellularComplex<1>* p) 
 	{
 		return this;
@@ -29,11 +31,18 @@ public:
 
 	virtual InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const = 0;
 	virtual InteractionEvent* selfinteract(Pathlet* pathlet, double start_time, double stop_time) const = 0;
-	
 	virtual void writeMathematicaGraphics(ofstream & of) = 0;
 	virtual void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop) = 0;
+*/	
 
-	virtual double* get_random_point(double time) const = 0;
+	/**
+	 * Needs to return a compact project onto the line since the line is infinite
+	 */
+	double* get_random_point(double time) const 
+	{
+		// ...
+		return 0;
+	}
 };
 
 #endif

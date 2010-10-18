@@ -15,9 +15,11 @@ CreationEvent* Source::create(double start, double stop) const
 	double time = randomRange(start, stop);
 		//geometry->get_random_point(p, time);
 		//momentum->get_randim_ponit(q, time);
-	double* x = geometry->get_random_point(time);
+	//double* x = geometry->get_random_point(time);
+	double* x = geometry->get_random_point();
 	//double* q = momentum->get_random_point(time);
-	double* v = momentum->get_random_point(time);
+	//double* v = momentum->get_random_point(time);
+	double* v = momentum->get_random_point();
 	for(int i=0; i<3; i++)
 		v[i] /= particle->mass;
 	return new CreationEvent(time, x, v);

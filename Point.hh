@@ -1,7 +1,7 @@
 #ifndef __class_Point_hh__
 #define __class_Point_hh__
 
-#include "Complex.hh"
+#include "Geometry.hh"
 
 
 using namespace std;
@@ -11,10 +11,11 @@ using namespace std;
  *
  * Author: Kevin Peter Hickerson
  */
-template <dimension k>
-class Point : public Complex<0>// Geometry
+template <dimension n>
+//class Point : CellularComplex<0,n>
+class Point : public Geometry
 {
-	double x[k];
+	double x[n];
 
 public:
 	Point() {};
@@ -27,7 +28,11 @@ public:
 	virtual void writeMathematicaGraphics(ofstream & of) = 0;
 	virtual void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop) = 0;
 
-	virtual double* get_random_point(double time) const = 0;
+	//virtual double* get_random_point(double time) const = 0;
+	virtual Point<n>* get_random_point() const
+	{
+		return this;
+	}
 };
 
 #endif

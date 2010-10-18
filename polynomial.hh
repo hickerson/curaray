@@ -75,12 +75,8 @@ public:
 	{
 		double value = _c[_degree];
 		for (int n = _degree-1; n >= 0; n--)
-		{
 			value = _c[n] + t * value;
-        	//value *= t;
-			//value += _c[n];
-			//cout << "n=" << n <<endl;
-		}
+
 		return value;
 	}
 	
@@ -88,9 +84,8 @@ public:
 	{
 		double value = _c[_degree];
 		for (int n = _degree-1; n > 0; n--)
-		{
         	value = _c[n] + n * t * value;
-		}
+
 		return value;
 	}
 	
@@ -148,6 +143,38 @@ public:
 	{
 		for (int n = _degree; n >=0; n--)
 			_c[n] *= d;
+
+		return *this;
+	}
+	
+	polynomial& operator*=(const polynomial& p)
+	{
+		if (p._degree > 0)
+		{
+			// must resize for multiplier of degree >1
+			unsigned __degree = p._degree + _degree;
+			double* __c = new double[__degree + 1];
+
+			// initialize coefficients
+			for (int n = 0; n <= __degree; n++)
+				__c[n] = 0;
+
+			// expand sum
+			for (int i = 0; i <= __degree; i++)
+				for (int j = _degree; j < __degree - i; j++)
+					__c[i] += p._c[i-j] * _c[j];
+			
+			// free up old copy and transfer new memory
+			delete [] _c;
+			_degree = __degree;
+			_c = __c;
+		}
+		else
+		{
+			// simply multiply by a constant
+			for (int n = 0; n <= _degree; n++)
+				_c[n] *= p._c[0];
+		}
 		return *this;
 	}
 	
@@ -182,7 +209,7 @@ public:
 	friend ostream& operator<< (ostream& out, const polynomial& p)
 	{
 		for (int n = p._degree; n > 0; n--)
-			out << p._c[n] << "*t^" << n << " + ";
+			out << p._c[n] << "*x^" << n << " + ";
 		out << p._c[0];
 	}
 };

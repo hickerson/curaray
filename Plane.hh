@@ -4,21 +4,21 @@
 #include <string>
 #include <iostream>
 #include "Surface.hh"
+#include "MonteCarlo.hh"
 
-#define dot(u,v)  (u[0]*v[0]+u[1]*v[1]+u[2]*v[2])
-
+#define abs(x) (x>=0?x:-x)
 using namespace std;
 
 /**
- * Plane
+ * k-Plane
  *
  * Author: Kevin Peter Hickerson
  */
-//class Plane : Boundary
-class Plane : public Surface
+template <dimension n>
+class Plane : public Surface<n>
 {
-	double normal[3];
-	double center[3];
+	double normal[n];
+	double center[n];
 	double nc;
 		
 public:
@@ -26,15 +26,15 @@ public:
 	Plane(int axis)
 	{
 		normal[axis] = 1;
-		for (int i=1; i < 2; i++)
-			center[(axis + i)%3] = 0;
+		for (int i=1; i < n+2; i++)
+			center[(axis + i)%(n+2)] = 0;
 		nc = 0;
 	}
 	
 	// defaults to passing through the origin
-	Plane(double _normal[3]) 
+	Plane(double _normal[n+2]) 
 	{
-		for (int i=0; i < 3; i++)
+		for (int i=0; i < n+2; i++)
 		{
 			normal[i] = _normal[i];
 			center[i] = 0;
@@ -42,26 +42,181 @@ public:
 		nc = 0;
 	}
 	
-	Plane(double _normal[3], double _center[3]) 
+	Plane(double _normal[n+2], double _center[n+2]) 
+		: nc(0)
 	{
-		for (int i=0; i < 3; i++)
+		for (int i=0; i < n+2; i++)
 		{
+			// TODO iterate through instead of index
 			normal[i] = _normal[i];
 			center[i] = _center[i];
+			nc += normal[i] * center[i];
 		}
-		nc = dot (normal, center);
 	}
 	
 	~Plane();
 
+/*
 public:
 	// TODO this doesn't belong here because an infinite plane is not compact
+	// for now this can return the projection of a 2-Sphere point onto the plane
 	double* get_random_point(double time) const;
 
 	InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const;
 	InteractionEvent* selfinteract(Pathlet* pathlet, double start_time, double stop_time) const;
 	void writeMathematicaGraphics(ofstream & of);
 	void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_time);
+*/
+
+public:
+	CellularComplex<1,n+1>* get_boundary() 
+	{
+		return 0; // without boundary
+	}
+
+	CellularComplex<1,1>* intersection(CellularComplex<1,n+1>* p)
+	{
+		// ...
+	}
+
+	InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const
+	{
+		polynomial p = 0;
+
+		for (int i = 0; i < 3; i++)
+		{
+			polynomial q = pathlet->curve[i];
+			q *= normal[i];
+			p += q;
+
+		}
+		p += -nc;
+		cout << p << endl;
+		double* root = new double[p.get_degree()];
+		int n_roots = p.solve_real_roots(root);
+		//if (n_roots < 1)
+		//	return 0;
+
+		for (int i = 0; i < n_roots; i++)
+		{
+			double t = root[i];
+			if (t > 0.00001)
+			{
+				t += start_time;
+				if (t > stop_time)
+					return 0;
+
+				InteractionEvent* interaction = new InteractionEvent(t, this);
+				interaction->set_normal(normal);
+				return interaction;
+			}
+		}
+
+		return 0;
+	}
+
+	InteractionEvent* selfinteract(Pathlet* pathlet, double start_time, double stop_time) const
+	{
+		// TODO optimize
+		return interact(pathlet, start_time, stop_time);
+		/*
+		polynomial p = 0;
+
+		for (int i = 0; i < 3; i++)
+		{
+			polynomial q = pathlet->curve[i];
+			q *= normal[i];
+			p += q;
+
+		}
+		p += -nc;
+		cout << p << endl;
+		double* root = new double[p.get_degree()];
+		int n_roots = p.solve_real_roots(root);
+		if (n_roots < 2)
+			return 0;
+
+		double t = root[0];
+		if (t < 0.000000001)
+			return 0;
+
+		t += start_time;
+		if (t > stop_time)
+			return 0;
+
+		InteractionEvent* interaction = new InteractionEvent(t, this);
+		interaction->set_normal(normal);
+		return interaction;
+		polynomial p = 0;
+		*/
+		/*
+
+		for (int i = 0; i < 3; i++)
+		{
+			polynomial q = pathlet->curve[0];
+			q *= normal[i];
+			p += q;
+		}
+		p += -nc;
+		cout << p << endl;
+		double* root = new double[p.get_degree()];
+		int n_roots = p.solve_real_roots(root);
+		if (n_roots > 1)
+		{
+			double t = root[1];
+			if (t > 0)
+				t += start_time;
+			else
+				return 0;
+
+			if (t < stop_time)
+				return new InteractionEvent(t, this);
+			else
+				return 0;
+		}
+		else 
+			return 0;
+		*/
+	}
+
+	// TODO this doesn't belong here because an infinite plane is not compact
+	// for now this can return the projection of a 2-Sphere point onto the plane
+	//double* get_random_point(double time) const 
+	double* get_random_point() const 
+	{
+		// XXX only compact geometries can support uniformly distributed points
+		return 0;
+	}
+
+	void writeMathematicaGraphics(ofstream & math_file) 
+	{
+		// TODO principle axis
+		/*
+		int axis = 0;
+		double max_value = 0;
+		for (int i = 0; i < 3; i++)
+		{
+			double value = abs(normal[i]);
+			if (value > max_value)
+			{
+				max_value = value;
+				axis = i;
+			}
+		}
+
+		math_file << "ParametricPlot3D[ "
+				  << "(nc -" << center[(axis+1)%3] << "*u - " << center[(axis+2)%3] << "*v) / " << center[axis] << ", "
+				  << "{u, -1, 1}, {v, -1, 1}];";
+				  */
+		math_file << "Plot3D[ "
+				  << "(" << nc << " - " << normal[0] << "*x - " << normal[1] << "*y) / " << normal[2] << ", "
+				  << "{x, -4, 4}, {y, -4, 4}]";
+	}
+
+	void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop)
+	{
+		writeMathematicaGraphics(math_file);
+	}
 };
 
 #endif

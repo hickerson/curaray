@@ -10,8 +10,8 @@ using namespace std;
  *
  * Author: Kevin Peter Hickerson
  */
-template <dimension k> 
-class Ball : public CellularComplex<k>
+template <dimension k, codimension n> 
+class Ball : public CellularComplex<k,n>
 {
 	double radius;
 	double center[k];
@@ -47,8 +47,8 @@ public:
 	void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop);
 };
 
-template <dimension k>
-double* Ball<k>::get_random_point(double time) const 
+template <dimension k, codimension n>
+double* Ball<k,n>::get_random_point(double time) const 
 {
 	double* p = new double[k];
 	// randomBallVector(p, radius);  // TODO make multidimensional 
@@ -57,17 +57,16 @@ double* Ball<k>::get_random_point(double time) const
 	return p;
 }
 
-template <dimension k>
-void Ball<k>::writeMathematicaGraphics(ofstream & math_file) 
+template <dimension k, codimension n>
+void Ball<k,n>::writeMathematicaGraphics(ofstream & math_file) 
 {
 	math_file << "Graphics3D[ {Red, Opacity[0.3], "
 			  << "Ball [{" << center[0] << ", " << center[1] << ", " << center[2] << "}, "  << radius << "]";
 	math_file << "}]";
 }
 
-// TODO StaticGeometry class?
-template <dimension k>
-void Ball<k>::writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop)
+template <dimension k, codimension n>
+void Ball<k,n>::writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop)
 {
 	writeMathematicaGraphics(math_file);
 }

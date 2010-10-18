@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 #include "loadSTL.hh"
-#include "Geometry.hh"
+#include "CellularComplex.hh"
 
 using namespace std;
 
@@ -13,7 +13,8 @@ using namespace std;
  *
  * Author: Kevin Peter Hickerson
  */
-class Solid : public Geometry
+template <dimension n = 3>
+class Solid : public CellularComplex<3, n-3>
 {
 	//Solid();
 	//~Solid();

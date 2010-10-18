@@ -19,7 +19,6 @@
 #include "Sphere.hh"
 #include "Plane.hh"
 #include "Interval.hh"
-
 using namespace std;
 
 // TODO make MathematicaStream
@@ -28,6 +27,11 @@ using namespace std;
 #define MULTIPLE_MATHEMATICA_FILES 	0
 #define DOWN 						2
 #define DIM							3
+
+void usage(string this_name)
+{
+	cout << "usage: " << this_name << " <filename>" << endl;
+}
 
 int main(int argc, char **argv)
 {
@@ -41,8 +45,12 @@ int main(int argc, char **argv)
     //stl_file = STLfile::readSTLfile(argv[1]);
     //assert(stl_file);
 #endif
-	assert (argv[1]);
-    string base_filename = argv[1];
+	if (!argv[1])
+	{
+		usage(argv[0]);
+    	exit(1);
+	}
+	string base_filename = argv[1];
 
 	// setup the simulation environment
     // old way ...
@@ -56,8 +64,8 @@ int main(int argc, char **argv)
 	*/
 	// new way ...
 	//Box* box = new Box(-4, 4, -4, 4, -4, 4);
-	double simulation_bounds[6] = {-4, 4, -4, 4, -4, 4};
-	Interval<3>* box = new Interval<3>(simulation_bounds); // TODO make 4D
+	double simulation_bounds[] = {-4, 4, -4, 4, -4, 4};
+	Interval<3,0>* box = new Interval<3,0>(simulation_bounds); // TODO make 4D
     // TODO will be part of the Simulation class
     const unsigned neutron_count = 100;
     //const unsigned segment_count = 3;
@@ -105,8 +113,10 @@ int main(int argc, char **argv)
 	double neutron_mass = 10.454077; //neV s^2/m^2
 	double neutron_energy = 250; // neV
 	double neutron_momentum = sqrt(2*neutron_mass*neutron_energy);
-	Sphere<2>* position_sphere = new Sphere<2>(center, 0.5);
-	Sphere<2>* momentum_sphere = new Sphere<2>(zero, neutron_momentum);
+	//Sphere<2>* position_sphere = new Sphere<2>(center, 0.5);
+	Sphere<2>* position_sphere = new Sphere<2>(0.5);
+	//Sphere<2>* momentum_sphere = new Sphere<2>(zero, neutron_momentum);
+	Sphere<2>* momentum_sphere = new Sphere<2>(neutron_momentum);
 	PowerLawSpectrum* spectrum = new PowerLawSpectrum(3/2, 350, 0, 70);
 	Particle* neutron = new Particle(neutron_mass, 0, 1/886.3);
 	Source* source = new Source(position_sphere, momentum_sphere, spectrum, neutron);
@@ -114,7 +124,7 @@ int main(int argc, char **argv)
 	
 	double ground_normal[3] = {0,0,1.0};
 	double ground_center[3] = {0,0,-1.0};
-	Plane* ground = new Plane(ground_normal, ground_center);
+	Plane<3>* ground = new Plane<3>(ground_normal, ground_center);
 	simulation.addGeometry(ground);
 	
      // compute paths

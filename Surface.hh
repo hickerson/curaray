@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 #include "loadSTL.hh"
-#include "Geometry.hh"
+#include "CellularComplex.hh"
 
 using namespace std;
 
@@ -13,7 +13,8 @@ using namespace std;
  *
  * Author: Kevin Peter Hickerson
  */
-class Surface : public Geometry
+template <codimension n>
+class Surface : public CellularComplex<2,n>
 {
 	//Surface();
 	//~Surface();
@@ -21,6 +22,7 @@ class Surface : public Geometry
 	//void member();
 };
 
+/*
 class STLSurface : Surface
 {
 public:
@@ -32,5 +34,6 @@ public:
 
 	//void member();
 };
+*/
 
 #endif

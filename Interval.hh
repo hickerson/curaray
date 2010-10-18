@@ -1,10 +1,7 @@
 #ifndef __class_Interval_hh__
 #define __class_Interval_hh__
 
-//#include <string>
-//#include <iostream>
 #include "CellularComplex.hh"
-
 //using namespace std;
 
 /**
@@ -15,14 +12,16 @@
  * Author: Kevin Peter Hickerson
  * Date:   Aug 23, 2010
  */
-template <dimension k>
-class Interval : public CellularComplex<k>
+template <dimension k, codimension n = 0>
+class Interval : public CellularComplex<k,n>
+//template <dimension k>
+//class Interval : public CellularComplex<k,0>
 {
 	double x[k][2];
-	//Cube<k-1> boundary;
+	//Box<k-1> boundary;
 
 public:	
-	Interval<k>(const double _x[2*k])
+	Interval(const double _x[2*k])
 	{
 		for (unsigned i = 0; i < k; i++)
 		{
@@ -31,14 +30,14 @@ public:
 		}
 	}
 
-	Interval<k>(const double _x[k][2])
+	Interval(const double _x[k][2])
 	{
 		for (unsigned i = 0; i < k; i++)
 			for (unsigned j = 0; j < 2; j++)
 				x[i][j] = _x[i][j];
 	}
 
-	Interval<k>(const double min[k], const double max[k])
+	Interval(const double min[k], const double max[k])
 	{
 		for (unsigned i = 0; i < k; i++)
 		{
@@ -47,14 +46,21 @@ public:
 		}	
 	}
 
-	Interval<k>(const Interval<k> &copy)
+	Interval(const Interval<k> &copy)
 	{
 		for (unsigned i = 0; i < k; i++)
 			for (unsigned j = 0; j < 2; j++)
 				x[i][j] = copy.x[i][j];
 	}
+
 	~Interval() {}
 		
+	CellularComplex<1,1>* intersection(CellularComplex<1,k+n-1>* path)
+	{
+		// TODO ...
+	}
+
+/*
 	InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const
 	{
 		return NULL;
@@ -64,8 +70,11 @@ public:
 	{
 		return NULL;
 	}
+*/
 
-	double* get_random_point(double time) const 
+	//double* get_random_point(double time) const 
+	//Point<k+n>* get_random_point() const 
+	double* get_random_point() const 
 	{
 		double* p = new double[k];
 		for (unsigned i = 0; i < k; i++)
@@ -84,13 +93,12 @@ public:
 		// TODO
 		abort();
 	}
-/*
-	InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const;
-	InteractionEvent* self_interact(Pathlet* pathlet, double start_time, double stop_time) const;
-	double* get_random_point(double time) const;
-	void writeMathematicaGraphics(ofstream & of);
-	void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop);
-*/
+
+	CellularComplex<k-1,n+1>* get_boundary()
+	{
+		// TODO needs to return a box
+		abort();
+	}
 };
 
 #endif

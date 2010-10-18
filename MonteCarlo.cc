@@ -84,6 +84,7 @@ void randomSphereVector(double sphere[3], double r)
 	sphere[i] *= mag;
 }
 
+
 void randomHemiSphereVector(const double dir[3], double sphere[3], double r) 
 {
 	randomSphereVector(sphere, r);

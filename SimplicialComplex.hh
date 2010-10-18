@@ -13,17 +13,25 @@ using namespace std;
  * Author: Kevin Peter Hickerson
  * Created: Aug 25, 2010
  */
-template <dimension k>
-class SimplicialComplex : public CellularComplex<k>
+template <dimension k, codimension n>
+class SimplicialComplex : public CellularComplex<k,n>
 {
+//	SimplicialComplex<k-1,n+1> sub_complex;
+
 public:
-	SimplicialComplex<k>(const SimplicialComplex<k> & copy)
+	SimplicialComplex(const double roots[], int n_roots)
+	{
+		for (int i = 0; i < n_roots; i++)
+			;//add_cell(new Singleton<1>(root[i]));
+	}
+
+	SimplicialComplex(const SimplicialComplex & copy)
 	{
 	}
 
 	~SimplicialComplex();
 	
-	SimplicialComplex<k> & operator = (const SimplicialComplex<k> & other)
+	SimplicialComplex<k,n> & operator = (const SimplicialComplex<k,n> & other)
     {
         if (this != &other) // protect against invalid self-assignment
         {
@@ -33,6 +41,14 @@ public:
         }
         return *this;
     }
-};
 
+	//void add_cell(SimplicialSimplex* 
+};
+/*
+template <0, codimension n>
+class SimplicialComplex : public CellularComplex<0,n>
+{
+	vector<Point<n>>  point;
+}
+*/
 #endif
