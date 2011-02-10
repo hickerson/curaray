@@ -35,16 +35,6 @@ void usage(string this_name)
 
 int main(int argc, char **argv)
 {
-#if 0 
-// only once
-    // Load the STL file
-    //STLfile *stl_file;
-    //assert (argv[1]);
-    //string stl_filename = argv[1];
-    //string base_filename = stl_filename;
-    //stl_file = STLfile::readSTLfile(argv[1]);
-    //assert(stl_file);
-#endif
 	if (!argv[1])
 	{
 		usage(argv[0]);
@@ -53,16 +43,6 @@ int main(int argc, char **argv)
 	string base_filename = argv[1];
 
 	// setup the simulation environment
-    // old way ...
-	/*unsigned max_depth = 1;
-    unsigned fields_count = 1;
-    Octree octree(-1, 4,
-		  -1, 4,
-		  -1, 4,
-		  fields_count,
-		  max_depth);
-	*/
-	// new way ...
 	//Box* box = new Box(-4, 4, -4, 4, -4, 4);
 	double simulation_bounds[] = {-4, 4, -4, 4, -4, 4};
 	Interval<3,0>* box = new Interval<3,0>(simulation_bounds); // TODO make 4D
@@ -85,8 +65,8 @@ int main(int argc, char **argv)
 	*/
 	// new way ...
 	//ConstantForceField *gravity = new ConstantForceField(-9.80665,DOWN); // TODO fix 
-	// new way ...
-	ConstantForceField *gravity = new ConstantForceField(-9.80665,DOWN); // TODO fix 
+	// newer way ...
+	ConstantForceField *gravity = new ConstantForceField(-9.80665, DOWN); // TODO fix 
 	simulation.addField(gravity);
 	
     // TODO make ParticleSource
