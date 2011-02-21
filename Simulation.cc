@@ -18,7 +18,7 @@
 //}
 
 
-Simulation::Simulation(const Solid *_volume) 
+Simulation::Simulation(const Geometry *_volume) 
 	: volume(_volume), earliest_time(0), latest_time(0)
 {
 	//addGeometry(volume);
@@ -26,7 +26,7 @@ Simulation::Simulation(const Solid *_volume)
     //unsigned fields_count = 1;
 }
 
-Simulation::Simulation(const Solid *_volume, 
+Simulation::Simulation(const Geometry *_volume, 
 					   double _earliest_time, 
 					   double _latest_time)
 	: volume(_volume), earliest_time(_earliest_time), latest_time(_latest_time)
@@ -61,7 +61,7 @@ Pathlet* Simulation::advance(ParticleEvent *event)
 			Field* field = *f;
 			int d = field->get_degree(event, axis); // TODO support time varying fields
 			if (d > degree)
-				degree = d;				
+				degree = d + 1;	// TODO clarify what we mean by degree of a field
 		}
 		
 		//p[axis] = new polynomial(degree);
@@ -368,7 +368,8 @@ void Simulation::writeMathematicaGraphics(ofstream &math_file, double start_writ
 		path->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
 		math_file << ", " << endl;
 	}
-
+/*
+*/
     math_file << "PlotRange -> {{-3, 3}, {-3,3}, {-3, 3}}" << endl;
 	math_file << "]" << endl;
 }

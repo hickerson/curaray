@@ -1,5 +1,5 @@
-#ifndef __VISUALIZATION_HH__
-#define __VISUALIZATION_HH__
+#ifndef __MATHEMATICA_VISUALIZATION_HH__
+#define __MATHEMATICA_VISUALIZATION_HH__
 
 #include <string>
 #include <iostream>
@@ -7,10 +7,11 @@
 #include <fstream>
 #include <sstream>
 //#include "Graphics.hh"
+#include "MathematicaStream.hh"
 
 using namespace std;
 
-class Visualization 
+class MathematicaVisualization 
 {
 	const string    name;
 	Box*    		region;
@@ -19,14 +20,12 @@ class Visualization
     double    		start_time;
     double    		stop_time;
     
-    ofstream 		math_file; 
-    Graphics3D* 	frame;
+    MathematicaStream 		math_file; 
+    Graphics3D* 			frame;
 
 	Visualization(string _name, Box* _region) 
 	  : name(_name), 
 		region(_region) {}
-			
-	
 };
 
 

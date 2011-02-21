@@ -2,6 +2,7 @@
 #define __class_Interval_hh__
 
 #include "CellularComplex.hh"
+#include "Geometry.hh"
 //using namespace std;
 
 /**
@@ -13,7 +14,8 @@
  * Date:   Aug 23, 2010
  */
 template <dimension k, codimension n = 0>
-class Interval : public CellularComplex<k,n>
+//class Interval : public CellularComplex<k,n>
+class Interval : public Geometry
 //template <dimension k>
 //class Interval : public CellularComplex<k,0>
 {
@@ -55,22 +57,24 @@ public:
 
 	~Interval() {}
 		
+	/*
 	CellularComplex<1,1>* intersection(CellularComplex<1,k+n-1>* path)
 	{
 		// TODO ...
 	}
+	*/
 
-/*
 	InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const
 	{
-		return NULL;
+		//abort ();
+		return 0;
 	}
 
 	InteractionEvent* selfinteract(Pathlet* pathlet, double start_time, double stop_time) const
 	{
-		return NULL;
+		//abort ();
+		return 0;
 	}
-*/
 
 	//double* get_random_point(double time) const 
 	//Point<k+n>* get_random_point() const 

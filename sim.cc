@@ -43,136 +43,42 @@ int main(int argc, char **argv)
 	string base_filename = argv[1];
 
 	// setup the simulation environment
-	//Box* box = new Box(-4, 4, -4, 4, -4, 4);
-	double simulation_bounds[] = {-4, 4, -4, 4, -4, 4};
-	Interval<3,0>* box = new Interval<3,0>(simulation_bounds); // TODO make 4D
     // TODO will be part of the Simulation class
     const unsigned neutron_count = 100;
-    //const unsigned segment_count = 3;
-    //const unsigned buffer_size = 1024;
     const double start_time = 0;
     const double stop_time = 4;
 	
+	double simulation_bounds[] = {-4, 4, -4, 4, -4, 4};
+	Interval<3,0>* box = new Interval<3,0>(simulation_bounds); // TODO make 4D
 	Simulation simulation(box, start_time, stop_time);
 	
-	// add gravity
-	// old way ...
-    /*
-	double gravity[3] = {0,-9.8,0}; // m/s^2
-    VectorField *field = new ConstantGravityField(gravity);
-    octree.setup_vector_fields(&field);
-    octree.walls = stl_file;
-	*/
-	// new way ...
-	//ConstantForceField *gravity = new ConstantForceField(-9.80665,DOWN); // TODO fix 
-	// newer way ...
-	ConstantForceField *gravity = new ConstantForceField(-9.80665, DOWN); // TODO fix 
-	simulation.addField(gravity);
-	
-    // TODO make ParticleSource
-    // make all the neutrons
-    // old way ...
-	/*
-	Particle particle[neutron_count];
-    for (unsigned i = 0; i < neutron_count; i++)
-    {
-	double velocity[3];
-	double position[3] = {0,0,0};
-        randomSphereVector(velocity, randomPowerLaw(7,2));
-        //randomSphereVector(velocity, randomRange(6,7));
-        //randomSphereVector(velocity, 7);
-        //randomDiskVector(position, 0.02);
-    	Particle neutron(position, velocity, 0, 1.0);
-    	particle[i] = neutron;
-     }
-	 */
-	 
-	// new way ...
-	double center[3] = {0,0,0};
-	double zero[3] = {0,0,0};
+	// add sources of neutrons 
 	double neutron_mass = 10.454077; //neV s^2/m^2
 	double neutron_energy = 250; // neV
 	double neutron_momentum = sqrt(2*neutron_mass*neutron_energy);
-	//Sphere<2>* position_sphere = new Sphere<2>(center, 0.5);
 	Sphere<2>* position_sphere = new Sphere<2>(0.5);
-	//Sphere<2>* momentum_sphere = new Sphere<2>(zero, neutron_momentum);
 	Sphere<2>* momentum_sphere = new Sphere<2>(neutron_momentum);
+	//double center[3] = {0,0,0};
+	//double zero[3] = {0,0,0};
+	//Sphere<2>* position_sphere = new Sphere<2>(center, 0.5);
+	//Sphere<2>* momentum_sphere = new Sphere<2>(zero, neutron_momentum);
 	PowerLawSpectrum* spectrum = new PowerLawSpectrum(3/2, 350, 0, 70);
 	Particle* neutron = new Particle(neutron_mass, 0, 1/886.3);
 	Source* source = new Source(position_sphere, momentum_sphere, spectrum, neutron);
 	simulation.addSource(source);
 	
+	// add geometry
 	double ground_normal[3] = {0,0,1.0};
 	double ground_center[3] = {0,0,-1.0};
-	Plane<3>* ground = new Plane<3>(ground_normal, ground_center);
+	//Plane<3>* ground = new Plane<3>(ground_normal, ground_center);
+	Plane<2>* ground = new Plane<2>(ground_normal, ground_center);
 	simulation.addGeometry(ground);
-	
+
+	// add fields
+	ConstantForceField* gravity = new ConstantForceField(-9.8,2);
+	simulation.addField(gravity);
+
      // compute paths
-	 // old way...
-	 /*
-     ParticlePath ucn_path[neutron_count];
-     for (unsigned i = 0; i < neutron_count; i++)
-     {
-     #if 0
-        cout << "simulating path " << i << "...";
-        cout.flush();
-
-        // start path segments
-        double last_time = start_time;
-        //ucn_path[i] = ParticlePath(1024, start_time, stop_time);
-        ucn_path[i].sample = new ParticlePathSample[buffer_size];
-        ucn_path[i].start_time = start_time;
-        ucn_path[i].stop_time = stop_time;
-        ucn_path[i].count = buffer_size;
-        ucn_path[i].show();
-        int j = 0;
-    	while (last_time < stop_time)
-        {
-            assert( j < buffer_size - 1);
-            // copy over particle information to path
-            //ParticlePathSample sample;
-            //sample.stop_time = particle[i].time;
-            //ucn_path[i].sample[j] = sample; // XXX replace with add
-            ucn_path[i].sample[j].order = 3;
-            for (int k = 0; k < 3; k++)
-            {
-                ucn_path[i].sample[j].coefficient[0][k] = particle[i].position[k];
-                ucn_path[i].sample[j].coefficient[1][k] = particle[i].velocity[k];
-                ucn_path[i].sample[j].coefficient[2][k] = gravity[k] / 2;
-            }
-            ucn_path[i].sample[j].start_time = last_time;
-           
-            // step forward
-    	    // TODO octree.step_particle(&particle[i], &ucn_path[i], t_start, t_stop);
-    	    octree.step_particle(&particle[i]);
-            // XXX deal with this condition
-            if (not octree.in_bounds(particle[i].position))
-            {
-       	        cerr << "{" << particle[i].position[0] << ", " 
-                            << particle[i].position[2] << ", " 
-                            << particle[i].position[1] << "}" << endl;
-                ucn_path[i].hide();
-            }
-
-            // look for the end of the path sample
-            const double next_time = particle[i].time;
-            ucn_path[i].sample[j].stop_time = next_time;
-            last_time = next_time;
-            j++;
-	}
-        ucn_path[i].count = j;
-        if (ucn_path[i].check(0.00000001) > 0)
-        {
-            cerr << "Detected errors in path " << i << "." << endl
-                 << "aborting..." << endl;
-            exit(1);
-        }
-        cout << "done." << endl;
-	#endif
-     }
-	*/
-	
-	// new way ...
 	simulation.run(start_time, stop_time, neutron_count);
 	// TODO save simulation to file
 
@@ -204,8 +110,9 @@ int main(int argc, char **argv)
     // Execute mathematica file
     cout << "serching in path " << getenv("PATH") << endl;
     cout << "Mathematica:" << endl;
-    string s = "math -noprompt -run \"<<" + base_filename + ".math" + "\"";
-	cout << "Mathematica returned " << system(s.c_str()) << endl;
+    string s = "math -noprompt -run \"<<" + base_filename + ".math" + "\" > mathematica.log";
+		cout << "Mathematica returned " << system(s.c_str()) << endl;
+
     // TODO sys << "math -noprompt -run \"<<" << base_filename << "\"" << execute;
     // TODO if (sys.error())
     // TODO     cerr << "Mathematica returned " << sys.error() << endl;
@@ -216,7 +123,7 @@ int main(int argc, char **argv)
     string s = "math -noprompt -run \"<<" + frame_name[frame]+ ".math" + "\"";
     for (int frame = 0; frame < frame_count; frame++)
     {
-    string s = "math -noprompt -run \"<<" + frame_name[frame]+ ".math" + "\"";
+    string s = "math -noprompt -run \"<<" + frame_name[frame]+ ".math" + "\" > mathematica.log";
     cout << "Mathematica returned " << system(s.c_str()) << endl;
     // TODO sys << "math -noprompt -run \"<<" << math_filename[frame] << "\"" << execute;
     // TODO if (sys.error())

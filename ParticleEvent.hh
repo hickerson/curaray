@@ -53,7 +53,7 @@ public:
 		return position[i];
 	}
 	
-	double set_velocity(double v[3])
+	void set_velocity(double v[3])
 	{
 		for (int i=0; i<3; i++)
 			velocity[i] = v[i];
@@ -65,7 +65,7 @@ public:
 			momentum[i] = p[i];
 	}
 */	
-	double set_position(double x[3])
+	void set_position(double x[3])
 	{
 		for (int i=0; i<3; i++)
 			position[i] = x[i];

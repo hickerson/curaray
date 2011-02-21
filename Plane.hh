@@ -3,7 +3,7 @@
 
 #include <string>
 #include <iostream>
-#include "Surface.hh"
+#include "Geometry.hh"
 #include "MonteCarlo.hh"
 
 #define abs(x) (x>=0?x:-x)
@@ -14,11 +14,12 @@ using namespace std;
  *
  * Author: Kevin Peter Hickerson
  */
-template <dimension n>
-class Plane : public Surface<n>
+template <dimension n, codimension k=1>
+//class Plane : public Geometry<n,k>
+class Plane : public Geometry
 {
-	double normal[n];
-	double center[n];
+	double normal[n+k];
+	double center[n+k];
 	double nc;
 		
 public:
@@ -26,15 +27,17 @@ public:
 	Plane(int axis)
 	{
 		normal[axis] = 1;
-		for (int i=1; i < n+2; i++)
-			center[(axis + i)%(n+2)] = 0;
+		for (int i=1; i < n+k; i++)
+			center[(axis+i)%(n+k)] = 0;
 		nc = 0;
 	}
 	
 	// defaults to passing through the origin
-	Plane(double _normal[n+2]) 
+	Plane(double _normal[n+k]) 
 	{
-		for (int i=0; i < n+2; i++)
+		if (k != 1)
+			abort ();
+		for (int i=0; i < n+k; i++)
 		{
 			normal[i] = _normal[i];
 			center[i] = 0;
@@ -42,10 +45,10 @@ public:
 		nc = 0;
 	}
 	
-	Plane(double _normal[n+2], double _center[n+2]) 
+	Plane(double _normal[n+k], double _center[n+k]) 
 		: nc(0)
 	{
-		for (int i=0; i < n+2; i++)
+		for (int i=0; i < n+k; i++)
 		{
 			// TODO iterate through instead of index
 			normal[i] = _normal[i];
@@ -69,6 +72,7 @@ public:
 */
 
 public:
+	/*
 	CellularComplex<1,n+1>* get_boundary() 
 	{
 		return 0; // without boundary
@@ -76,8 +80,11 @@ public:
 
 	CellularComplex<1,1>* intersection(CellularComplex<1,n+1>* p)
 	{
+		assert (false);
+		return 0; 
 		// ...
 	}
+	*/
 
 	InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const
 	{
@@ -88,7 +95,6 @@ public:
 			polynomial q = pathlet->curve[i];
 			q *= normal[i];
 			p += q;
-
 		}
 		p += -nc;
 		cout << p << endl;
@@ -210,7 +216,8 @@ public:
 				  */
 		math_file << "Plot3D[ "
 				  << "(" << nc << " - " << normal[0] << "*x - " << normal[1] << "*y) / " << normal[2] << ", "
-				  << "{x, -4, 4}, {y, -4, 4}]";
+				  << "{x, -4, 4}, {y, -4, 4}, Mesh -> None,"
+				  << "PlotStyle -> Directive[LightGray, Specularity[White, 30]] ]";
 	}
 
 	void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop)

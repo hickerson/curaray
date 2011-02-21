@@ -17,7 +17,7 @@ using namespace std;
 
 //typedef vector<VectorField*> VectorFieldTable;
 //typedef vector<Surface*> SurfaceTable;
-typedef CellularComplex<3> Solid;
+//typedef CellularComplex<3> Solid;
 
 /**
  * Simulation
@@ -28,11 +28,12 @@ class Simulation // : Volume
 {
 	double 				earliest_time; 	/// the earliest time boundary of the simulation
 	double 				latest_time;  	/// the latest time boundary of the simulation
-	//const Volume* 		volume;     	/// the volume on which the simulation is valid
-    const Solid* volume;          		/// the volume on which the simulation is valid
+	//const Volume* 	volume;     	/// the volume on which the simulation is valid
+    //const Solid* 		volume;         /// the volume on which the simulation is valid
+    const Geometry*  	volume;         /// the geometry volume on which the simulation is valid
 	//Octree *octree;
-	//vector<Surface*> surfaces;   		/// surfaces that are not boundaries of volumes
-	//vector<Volumes*> volumes;     	/// volumes with surfaces boundaries 
+	//vector<Surface*> 	surfaces;   	/// surfaces that are not boundaries of volumes
+	//vector<Volumes*> 	volumes;     	/// volumes with surfaces boundaries 
 
 	vector<Field*> 		fields;     	/// fields that interact with particles
 	vector<Geometry*> 	geometries; 	/// geometries that interact with particles
@@ -43,8 +44,8 @@ public:
 	//Simulation();
 	//Simulation(const BoxVolume &_region, const Octree *_octree);
 	//Simulation(const Volume &_volume); // this doesn't work because volume is abstract
-	Simulation(const Solid *_volume);
-	Simulation(const Solid *_volume, double _start_time, double _stop_time);
+	Simulation(const Geometry *_volume);
+	Simulation(const Geometry *_volume, double _start_time, double _stop_time);
 	~Simulation();
 	
 	void addField(Field *field);

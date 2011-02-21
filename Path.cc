@@ -434,5 +434,5 @@ void Pathlet::writeMathematicaGraphics(ofstream &math_file, double start_write_t
 {
 	// XXX math_file << "Graphics3D[{" << endl << "RGBColor[0,0,0], " << endl;
 	math_file << "ParametricPlot3D[{" << curve[0] << ", " << curve[1] << ", " << curve[2] << "}, ";
-	math_file << "{t, " << 0 << ", " << (stop_time - start_time) / scale << "}]";
+	math_file << "{x, " << 0 << ", " << (stop_time - start_time) / scale << "}]";
 }

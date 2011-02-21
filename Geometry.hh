@@ -19,12 +19,12 @@ class InteractionEvent;
  * Author: Kevin Peter Hickerson
  * Modified: Aug 24, 2010
  */
-//template <dimension k>
+//template <dimension n, codimension m = 0> TODO turn this into a template class?
 class Geometry
 {
 public: 
-	virtual InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const {}
-	virtual InteractionEvent* selfinteract(Pathlet* pathlet, double start_time, double stop_time) const {}
+	virtual InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const = 0;
+	virtual InteractionEvent* selfinteract(Pathlet* pathlet, double start_time, double stop_time) const = 0;
 	
 	virtual void writeMathematicaGraphics(ofstream & of) = 0;
 	virtual void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop) = 0;

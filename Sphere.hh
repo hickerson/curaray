@@ -6,6 +6,7 @@
 #include "CellularComplex.hh"
 #include "SimplicialComplex.hh"
 #include "polynomial.hh"
+#include "MonteCarlo.hh"
 using namespace std;
 
 
@@ -15,11 +16,12 @@ using namespace std;
  * Author: Kevin Peter Hickerson
  */
 template <dimension k, codimension n = 1>
-class Sphere : public CellularComplex<k,n> 
+//class Sphere : public CellularComplex<k,n> 
+//class Sphere : public Geometry<k,n> 
+class Sphere : public Geometry
 {
 	double radius;
-	//double r2;
-	//double center[k+1];
+	//double center[k+n];
 	
 public:
 	Sphere(double r) // unit sphere
@@ -28,27 +30,26 @@ public:
 	Sphere() // unit sphere
 	: radius(1)
 	{
-/*
-		for (int i = 0; i < k+n; i++)
-			center[i] = 0;
-*/
+		//for (int i = 0; i < k+n; i++)
+		//	center[i] = 0;
 	}
-/*
+
 	Sphere(double _center[k+n], double _radius) 
 	: radius(_radius)
 	{
-		for (int i = 0; i < k+n; i++)
-			center[i] = _center[i];
+		//for (int i = 0; i < k+n; i++)
+		//	center[i] = _center[i];
 	}
-*/	
+
 	~Sphere();
 
+/*
 	CellularComplex<1,1>* intersection(CellularComplex<1,k+n-1>* path)
 	{
+		assert(false);
 		for (int i = 0; i < k+1; i++)
 			;
 	}
-
 	// temporary until I get my bearings... 
 	//CellularComplex<0,1>* intersection(polynomial[k+n] path, time start, time stop)
 	CellularComplex<0,1>* intersection(polynomial* path)//polynomial[k+n] path)
@@ -67,6 +68,7 @@ public:
 
 		return new SimplicialComplex<0,1>(roots, n_roots);
 	}
+*/
 /*
 	{
 		polynomial p = 0;
@@ -110,6 +112,16 @@ public:
 	void writeMathematicaGraphics(ofstream & of);
 	void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop);
 
+	virtual InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const
+	{
+		abort ();
+	}
+
+	virtual InteractionEvent* selfinteract(Pathlet* pathlet, double start_time, double stop_time) const
+	{
+		abort ();
+	}
+	
 	/**
 	 * A Sphere has no boundary
 	 */
@@ -138,18 +150,25 @@ template <dimension k, codimension n>
 double* Sphere<k,n>::get_random_point() const 
 {
 	double* p = new double[k+n];
-	//randomSphereVector(p, radius);
-	//for (int i = 0; i < k+n; i++)
-	//	p[i] += center[i];
+	assert (k+n == 3);
+
+	double q[3];
+	randomSphereVector(q, radius);
+	for (int i = 0; i < 3; i++)
+		p[i] = q[i];
+	for (int i = 3; i < k+n; i++)
+		p[i] = 0;
 	return p;
 }
 
 template <dimension k, codimension n>
 void Sphere<k,n>::writeMathematicaGraphics(ofstream & math_file) 
 {
+	cout << "Printing sphere.";
 	math_file 
-		<< "Graphics3D[ {Red, Opacity[0.3], Sphere [{" 
+		<< "Graphics3D[ {Red, Opacity[1], Sphere [{" 
 	    //<< center[0] << ", " << center[1] << ", " << center[2] 
+	    << "0,0,0"
         << "}, " << radius << "]}]";
 }
 

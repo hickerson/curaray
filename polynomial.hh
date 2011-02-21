@@ -17,7 +17,7 @@ using namespace std;
 class polynomial
 {
 private:
-	unsigned _degree; // TODO support Larant polynomial?
+	int _degree; // TODO support Larant polynomial?
 	//T c*;
 	double* _c;
   
@@ -29,11 +29,11 @@ public:
 		_c[0] = 0;
 	}		
   
-	polynomial(unsigned degree) : _degree(degree) 
+	polynomial(int degree) : _degree(degree) 
   	{
 		_c = new double[_degree + 1];
 		
-		for (unsigned i = 0; i <= _degree; i++) 
+		for (int i = 0; i <= _degree; i++) 
 			_c[i] = 0; 
 	};
 	
@@ -45,12 +45,12 @@ public:
 			_c[n] = p._c[n];
 	}
 	
-	polynomial(unsigned degree, double* coefficents) 
+	polynomial(int degree, double* coefficents) 
 		: _degree(degree) 
   	{
 		_c = new double[_degree + 1];
 		//cout << "degree " << degree << "->" << _degree << endl;
-		for (unsigned i = 0; i <= _degree; i++) 
+		for (int i = 0; i <= _degree; i++) 
 			_c[i] = coefficents[i];
 	};
 	
@@ -89,7 +89,7 @@ public:
 		return value;
 	}
 	
-	unsigned get_degree() const
+	int get_degree() const
 	{
 		return _degree;
 	}
@@ -124,8 +124,8 @@ public:
 		delete [] _c;
 		_c = new double[_degree + 1];
 	
-		for (int n = _degree; n >=0; n--)
-			_c[n] = p._c[n];
+		for (int i = _degree; i >= 0; i--)
+			_c[i] = p._c[i];
 		
 		return p;
 	}
@@ -152,7 +152,7 @@ public:
 		if (p._degree > 0)
 		{
 			// must resize for multiplier of degree >1
-			unsigned __degree = p._degree + _degree;
+			int __degree = p._degree + _degree;
 			double* __c = new double[__degree + 1];
 
 			// initialize coefficients
@@ -211,6 +211,7 @@ public:
 		for (int n = p._degree; n > 0; n--)
 			out << p._c[n] << "*x^" << n << " + ";
 		out << p._c[0];
+		return out;
 	}
 };
 

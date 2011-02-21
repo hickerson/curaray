@@ -11,9 +11,9 @@ using namespace std;
  *
  * Author: Kevin Peter Hickerson
  */
-template <dimension n>
+template <dimension n>//, codimension m = 0>
 //class Point : CellularComplex<0,n>
-class Point : public Geometry
+class Point : public Geometry//<n,m>
 {
 	double x[n];
 
