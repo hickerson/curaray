@@ -264,18 +264,23 @@ bool Simulation::run(double start_time, double stop_time)
 			event = new ContinuityEvent(max_time);
 
 			// TODO compute new position and velocity in public function 
+			path->append_continuity(pathlet, (ContinuityEvent*)event);
+/*
 			double delta_time = max_time - min_time;
 			for (int i = 0; i < 3; i++)
 			{
 				event->position[i] = pathlet->curve[i].evaluate(delta_time);
 				event->velocity[i] = pathlet->curve[i].derivative(delta_time);
 			}
+*/
 			running = true;
 			delete best_interaction;
 		}
 		else if (event == best_interaction)
 		{
 			// TODO compute new position and velocity in public function 
+			path->append_interaction(pathlet, (InteractionEvent*)event);
+/*
 			double delta_time = max_time - min_time;
 			for (int i = 0; i < 3; i++)
 			{
@@ -283,17 +288,17 @@ bool Simulation::run(double start_time, double stop_time)
 				event->velocity[i] = pathlet->curve[i].derivative(delta_time);
 			}
 			cout << "interaction normal {";
-			for (int i = 0; i < 3; i++)
-			{
-				cout << best_interaction->normal[i] <<" ";
-			}
-			cout << "}" << endl;
+			cout << best_interaction->normal[0] <<", ";
+			cout << best_interaction->normal[1] <<", ";
+			cout << best_interaction->normal[2] << "}" << endl;
 			event->reflect_velocity(best_interaction->normal);
+*/
 			last_geometry = best_geometry;
 			running = true;
 		}
+		else
+			path->append(pathlet, event);
 
-		path->append(pathlet, event);
 		int err_count = path->check(0.01);
 		if (err_count)
 		{

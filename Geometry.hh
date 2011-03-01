@@ -11,7 +11,6 @@ using namespace std;
 typedef int dimension;
 typedef int codimension;
 template <dimension n> class Point;
-class InteractionEvent;
 
 /**
  * Geometry

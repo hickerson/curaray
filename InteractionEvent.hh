@@ -4,14 +4,15 @@
 #include <string>
 #include <iostream>
 #include "ParticleEvent.hh"
-#include "Geometry.hh"
-#include "Path.hh"
+//#include "Geometry.hh"
+//#include "Path.hh"
 //#include "Surface.hh"
 
 
 using namespace std;
 
 class Geometry;
+class Pathlet;
 
 /**
  * InteractionEvent

@@ -6,9 +6,10 @@
 #include "ParticleEvent.hh"
 //#include "AnnihilationEvent.hh"
 //#include "CreationEvent.hh"
-#include "Path.hh"
+//#include "Path.hh"
 
 using namespace std;
+class Pathlet;
 
 /**
  * ContinuityEvent

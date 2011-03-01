@@ -22,10 +22,34 @@ void Path::append(Pathlet* pathlet, Event* event)
 	stop_event = event;
 	stop_time = event->time;
 	pathlet->stop_time = stop_time;
-	cout << "pathlet->start_time = " << pathlet->start_time << endl;
-	cout << "pathlet->stop_time = " << pathlet->stop_time << endl;
-	cout << "path start_time = " << start_time << endl;
-	cout << "path stop_time = " << stop_time << endl;
+	//cout << "pathlet->start_time = " << pathlet->start_time << endl;
+	//cout << "pathlet->stop_time = " << pathlet->stop_time << endl;
+	//cout << "path start_time = " << start_time << endl;
+	//cout << "path stop_time = " << stop_time << endl;
+}
+
+void Path::append_continuity(Pathlet* pathlet, ContinuityEvent* event)
+{
+	double t = event->get_time() - stop_time;
+	for (int i = 0; i < 3; i++)
+	{
+		event->position[i] = pathlet->curve[i].evaluate(t);
+		event->velocity[i] = pathlet->curve[i].derivative(t);
+	}
+	append(pathlet,event);
+}
+	
+void Path::append_interaction(Pathlet* pathlet, InteractionEvent* event)
+{
+	double t = event->get_time() - stop_time;
+	for (int i = 0; i < 3; i++)
+	{
+		event->position[i] = pathlet->curve[i].evaluate(t);
+		event->velocity[i] = pathlet->curve[i].derivative(t);
+	}
+	cout<<"interaction normal {"<<event->normal[0]<<", "<<event->normal[1]<<", "<<event->normal[2]<<"}"<<endl;
+	event->reflect_velocity(event->normal);
+	append(pathlet,event);
 }
 
 /*

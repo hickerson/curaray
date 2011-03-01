@@ -3,7 +3,7 @@
 
 #include "math.h"
 #include <vector>
-#include "Path.hh"
+//#include "Path.hh"
 
 #define dot(u,v)  (u[0]*v[0]+u[1]*v[1]+u[2]*v[2])
 #define norm(u)  sqrt(u[0]*u[0]+u[1]*u[1]+u[2]*u[2])

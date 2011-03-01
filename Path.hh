@@ -7,11 +7,17 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-//#include "Pathlet.hh"
-#include "ParticleEvent.hh"
+
 #include "polynomial.hh"
+#include "InteractionEvent.hh"
+#include "ContinuityEvent.hh"
 
 #define MAX_ORDER 4
+
+//class InteractionEvent;
+//class ContinuityEvent;
+//class ParticleEvent;
+//class Event;
 
 using namespace std;
 
@@ -111,6 +117,8 @@ public:
 	//void append(Event *event);
 	//void append(Pathlet *pathlet);
 	void append(Pathlet *pathlet, Event *event);
+	void append_continuity(Pathlet *pathlet, ContinuityEvent *event);
+	void append_interaction(Pathlet *pathlet, InteractionEvent *event);
 
     int check();
     int check(double epsilon);
