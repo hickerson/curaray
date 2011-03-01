@@ -12,17 +12,20 @@ CreationEvent* Source::create(double start, double stop) const
 		//double q[3];
 
 		// TODO hack to assume uniform in time
-	double time = randomRange(start, stop);
-		//geometry->get_random_point(p, time);
-		//momentum->get_randim_ponit(q, time);
-	//double* x = geometry->get_random_point(time);
+	double t = randomRange(start, stop);
+		//geometry->get_random_point(p, t);
+		//momentum->get_randim_ponit(q, t);
+	//double* x = geometry->get_random_point(t);
 	double* x = geometry->get_random_point();
-	//double* q = momentum->get_random_point(time);
-	//double* v = momentum->get_random_point(time);
+	//double* q = momentum->get_random_point(t);
+	//double* v = momentum->get_random_point(t);
 	double* v = momentum->get_random_point();
-	for(int i=0; i<3; i++)
+	cout << "random range returned time "<<t<<" in create"<<endl;
+
+	for(int i=0; i<3; i++) // TODO support dimension
 		v[i] /= particle->mass;
-	return new CreationEvent(time, x, v);
+
+	return new CreationEvent(t, x, v);
 }
 
 double Source::get_strength(double start_time, double stop_time)

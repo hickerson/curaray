@@ -22,14 +22,21 @@ class InteractionEvent : public ParticleEvent
 {
 	const Geometry* geometry;
 	const Pathlet*  before;
-	//const Surface*  surface;
 
 public:
 	double normal[3];
+	//const Surface*  surface;
 	
 public:
 	InteractionEvent(double t, const Geometry* g) 
-	: ParticleEvent(t), geometry(g), before(0) {};
+	: ParticleEvent(t), geometry(g), before(0) {}
+
+	InteractionEvent(double t, const Geometry* g, const double n[3]) 
+	: ParticleEvent(t), geometry(g), before(0) 
+	{
+		set_normal(n);
+	}
+
 	~InteractionEvent() {};
 
 	void set_normal(const double n[3]) 
@@ -38,5 +45,4 @@ public:
 			normal[i] = n[i];
 	}
 };
-
 #endif

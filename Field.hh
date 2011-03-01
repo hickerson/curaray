@@ -65,7 +65,7 @@ struct ConstantForceField : public VectorField
 		if (_gravity[axis] == 0)
 			return 0;
 		else 
-			return 1;
+			return 2;
 	}
 	
 	// TODO to require event time and particle properties

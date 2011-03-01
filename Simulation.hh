@@ -24,26 +24,19 @@ using namespace std;
  *
  * Author: Kevin Peter Hickerson
  */
-class Simulation // : Volume
+class Simulation
 {
 	double 				earliest_time; 	/// the earliest time boundary of the simulation
 	double 				latest_time;  	/// the latest time boundary of the simulation
-	//const Volume* 	volume;     	/// the volume on which the simulation is valid
-    //const Solid* 		volume;         /// the volume on which the simulation is valid
-    const Geometry*  	volume;         /// the geometry volume on which the simulation is valid
-	//Octree *octree;
-	//vector<Surface*> 	surfaces;   	/// surfaces that are not boundaries of volumes
-	//vector<Volumes*> 	volumes;     	/// volumes with surfaces boundaries 
+    const Geometry*  	volume;         /// the geometry on which the simulation is valid
 
 	vector<Field*> 		fields;     	/// fields that interact with particles
 	vector<Geometry*> 	geometries; 	/// geometries that interact with particles
-	vector<Source*> 	sources;    	/// sorces of particles
+	vector<Source*> 	sources;    	/// sources of point-like particles
 	vector<Path*>   	paths;			/// the paths of simulated particles
 	
 public:
 	//Simulation();
-	//Simulation(const BoxVolume &_region, const Octree *_octree);
-	//Simulation(const Volume &_volume); // this doesn't work because volume is abstract
 	Simulation(const Geometry *_volume);
 	Simulation(const Geometry *_volume, double _start_time, double _stop_time);
 	~Simulation();
@@ -51,8 +44,10 @@ public:
 	void addField(Field *field);
 	void addGeometry(Geometry *geometry);
 	void addSource(Source *source);
-	//void setVolume(Volume *volume);
-	
+	// TODO void setVolume(Geometry *geometry);
+	// TODO void addSink(...);	
+	// TODO void addVisulization(...);	
+
 	//void addSurface(Surface * _surface);
 	//void addVolume(Surface * _surface);
 	//void addSurface(STLSurface * stl_surface); // TODO UCNSimulation only

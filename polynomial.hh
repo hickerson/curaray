@@ -139,6 +139,18 @@ public:
 		return *this;
 	}
 	
+	polynomial& operator<<=(int s)
+	{
+		_degree -= s;
+		double* __c = new double[_degree + 1 - s];
+		for (int i = 0; i <= _degree; i++)
+			__c[i] = _c[i + s];
+
+		delete [] _c;
+		_c = __c;
+		return *this;
+	}
+
 	polynomial& operator*=(double d)
 	{
 		for (int n = _degree; n >=0; n--)
@@ -184,6 +196,12 @@ public:
 		return *this;
 	}
 	
+	polynomial& operator-=(double d)
+	{
+		_c[0] -= d;
+		return *this;
+	}
+	
 	polynomial& operator+=(const polynomial& p)
 	{
 		if (p._degree > _degree)
@@ -202,6 +220,28 @@ public:
 		{
 			for (int n = p._degree; n >=0; n--)
 				_c[n] += p._c[n];
+		}
+		return *this;
+	}
+	
+	polynomial& operator-=(const polynomial& p)
+	{
+		if (p._degree > _degree)
+		{
+			// must resize
+			double* c = new double[p._degree + 1];
+			for (int n = p._degree; n > _degree; n--)
+				c[n] = - p._c[n];
+			for (int n = _degree; n >=0; n--)
+				c[n] = _c[n] - p._c[n];
+			_degree = p._degree;
+			delete [] _c;
+			_c = c;
+		}
+		else
+		{
+			for (int n = p._degree; n >=0; n--)
+				_c[n] -= p._c[n];
 		}
 		return *this;
 	}

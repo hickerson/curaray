@@ -48,7 +48,7 @@ int main(int argc, char **argv)
     const double start_time = 0;
     const double stop_time = 4;
 	
-	double simulation_bounds[] = {-4, 4, -4, 4, -4, 4};
+	double simulation_bounds[] = {-8, 8, -8, 8, -8, 8};
 	Interval<3,0>* box = new Interval<3,0>(simulation_bounds); // TODO make 4D
 	Simulation simulation(box, start_time, stop_time);
 	
@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 	
 	// add geometry
 	double ground_normal[3] = {0,0,1.0};
-	double ground_center[3] = {0,0,-1.0};
+	double ground_center[3] = {0,0,-2.0};
 	//Plane<3>* ground = new Plane<3>(ground_normal, ground_center);
 	Plane<2>* ground = new Plane<2>(ground_normal, ground_center);
 	simulation.addGeometry(ground);
@@ -103,7 +103,7 @@ int main(int argc, char **argv)
 	simulation.writeMathematicaGraphics(math_file);
 	//math_file << "Export[\"" << base_filename << ".eps" << "\", graphics, "
 	math_file << "Export[\"" << base_filename << ".gif" << "\", graphics, "
-              << "ImageSize->600, ImageResolution->75]" << endl;
+              << "ImageSize->720, ImageResolution->200]" << endl;
     math_file << "Exit[]" << endl;
 
 #if 1

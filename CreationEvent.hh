@@ -16,18 +16,18 @@ using namespace std;
  */
 class CreationEvent : public ParticleEvent
 {
-	private:
-		Pathlet* after;
+private:
+	Pathlet* after;
 	
-	public:
-		CreationEvent(double t, double x[3], double v[3])
-		: ParticleEvent(t)
-		{
-			set_position(x);
-			//set_momentum(p);
-			set_velocity(v);
-		};
-		~CreationEvent();
+public:
+	CreationEvent(double t, double x[3], double v[3])
+	: ParticleEvent(t)
+	{
+		set_position(x);
+		set_velocity(v);
+	}
+
+	~CreationEvent();
 };
 
 #endif

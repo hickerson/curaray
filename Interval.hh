@@ -66,7 +66,18 @@ public:
 
 	InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const
 	{
-		//abort ();
+/*
+		for (int i = 0; i < 3; i++)
+		{
+			polynomial p[2] = {pathlet->curve[i], pathlet->curve[i]};
+			for (int j = 0; j < 2; j++)
+			{
+				p[j] -= x[i][j];
+				double* root = new double[p.get_degree()];
+				int n_roots = p.solve_real_roots(root);
+			}
+		}
+*/
 		return 0;
 	}
 

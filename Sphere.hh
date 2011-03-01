@@ -166,10 +166,10 @@ void Sphere<k,n>::writeMathematicaGraphics(ofstream & math_file)
 {
 	cout << "Printing sphere.";
 	math_file 
-		<< "Graphics3D[ {Red, Opacity[1], Sphere [{" 
+		<< "Graphics3D[ {Red, Opacity[1], Specularity[White, 30], Sphere [{" 
 	    //<< center[0] << ", " << center[1] << ", " << center[2] 
 	    << "0,0,0"
-        << "}, " << radius << "]}]";
+        << "}, " << radius << "]}, Background -> Black]";
 }
 
 template <dimension k, codimension n>

@@ -89,20 +89,30 @@ public:
 	InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const
 	{
 		polynomial p = 0;
-
 		for (int i = 0; i < 3; i++)
 		{
 			polynomial q = pathlet->curve[i];
 			q *= normal[i];
 			p += q;
 		}
-		p += -nc;
-		cout << p << endl;
+		p -= nc;
+
 		double* root = new double[p.get_degree()];
 		int n_roots = p.solve_real_roots(root);
-		//if (n_roots < 1)
-		//	return 0;
 
+		for (int i = 0; i < n_roots; i++)
+		{
+			double t = root[i] + pathlet->start_time;
+			cout << root[i] << " + ";
+			cout << pathlet->start_time << endl;
+			if (t > stop_time)
+				return 0;
+
+			if (t > start_time + 0.000001)
+				return new InteractionEvent(t, this, normal);
+		}
+
+		/*
 		for (int i = 0; i < n_roots; i++)
 		{
 			double t = root[i];
@@ -117,72 +127,47 @@ public:
 				return interaction;
 			}
 		}
-
+		*/
 		return 0;
 	}
 
 	InteractionEvent* selfinteract(Pathlet* pathlet, double start_time, double stop_time) const
 	{
-		// TODO optimize
-		return interact(pathlet, start_time, stop_time);
-		/*
-		polynomial p = 0;
 
+		cout << "looking for self-interaction" << endl;
+		// TODO optimize
+		/* TODO 
+		1. check degree
+		if (degree < 2)
+			return 0
+		
+		2. shift down degree to remove x=0 solution
+		*/
+
+		polynomial p = 0;
 		for (int i = 0; i < 3; i++)
 		{
 			polynomial q = pathlet->curve[i];
 			q *= normal[i];
 			p += q;
-
 		}
-		p += -nc;
-		cout << p << endl;
+		p -= nc; // no longer needed
+		p <<= 1;
+
 		double* root = new double[p.get_degree()];
 		int n_roots = p.solve_real_roots(root);
-		if (n_roots < 2)
-			return 0;
 
-		double t = root[0];
-		if (t < 0.000000001)
-			return 0;
-
-		t += start_time;
-		if (t > stop_time)
-			return 0;
-
-		InteractionEvent* interaction = new InteractionEvent(t, this);
-		interaction->set_normal(normal);
-		return interaction;
-		polynomial p = 0;
-		*/
-		/*
-
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < n_roots; i++)
 		{
-			polynomial q = pathlet->curve[0];
-			q *= normal[i];
-			p += q;
-		}
-		p += -nc;
-		cout << p << endl;
-		double* root = new double[p.get_degree()];
-		int n_roots = p.solve_real_roots(root);
-		if (n_roots > 1)
-		{
-			double t = root[1];
-			if (t > 0)
-				t += start_time;
-			else
+			double t = root[i] + pathlet->start_time;
+			if (t > stop_time)
 				return 0;
 
-			if (t < stop_time)
-				return new InteractionEvent(t, this);
-			else
-				return 0;
+			if (t > start_time)
+				return new InteractionEvent(t, this, normal);
 		}
-		else 
-			return 0;
-		*/
+
+		return 0;
 	}
 
 	// TODO this doesn't belong here because an infinite plane is not compact

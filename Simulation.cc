@@ -19,7 +19,9 @@
 
 
 Simulation::Simulation(const Geometry *_volume) 
-	: volume(_volume), earliest_time(0), latest_time(0)
+: 	earliest_time(0), 
+	latest_time(0),
+	volume(_volume) 
 {
 	//addGeometry(volume);
     //unsigned max_depth = 1;
@@ -29,7 +31,9 @@ Simulation::Simulation(const Geometry *_volume)
 Simulation::Simulation(const Geometry *_volume, 
 					   double _earliest_time, 
 					   double _latest_time)
-	: volume(_volume), earliest_time(_earliest_time), latest_time(_latest_time)
+: 	earliest_time(_earliest_time), 
+	latest_time(_latest_time),
+	volume(_volume)
 {
 }
 
@@ -44,28 +48,23 @@ Simulation::~Simulation() {}
 	
 // generate the next pathlet from the event using fields
 Pathlet* Simulation::advance(ParticleEvent *event)
-// TODO void Simulation::advance(Path *event)
 {
 	// TODO seperate polynomial solutions from Runge-Kutta
-	//Pathlet* pathlet = 0;
-	polynomial p[3];
-	//Pathlet* pathlet = path.stop_event;
+	polynomial p[3]; // TODO make dimensionality a parameter
 	
-	for (int axis = 0; axis < 3; axis++)
+	for (int axis = 0; axis < 3; axis++) // TODO make dimensionality a parameter
     {
-		int degree = 0;
+		int degree = 1;
 		vector<Field*>::iterator f;
 		for (f = fields.begin(); f != fields.end(); f++)
 		{
-			//cout << "checking field degree" << endl;
 			Field* field = *f;
 			int d = field->get_degree(event, axis); // TODO support time varying fields
 			if (d > degree)
-				degree = d + 1;	// TODO clarify what we mean by degree of a field
+				degree = d;	
 		}
 		
-		//p[axis] = new polynomial(degree);
-		if (degree == 2) // TODO check non negative 
+		if (degree == 2)
 		{
 			double c[3] = {
 				event->get_position(axis), // TODO move outside
@@ -75,35 +74,28 @@ Pathlet* Simulation::advance(ParticleEvent *event)
 			vector<Field*>::iterator f;
 			for (f = fields.begin(); f != fields.end(); f++)
 			{
-				Field* field = *f;
-				c[2] += 0.5 * field->get_acceleration(event, axis); // TODO support time varying fields
-				//cout << "c[2]: " << c[2] << endl;
+				Field* field = *f; // TODO support time varying fields
+				c[2] += 0.5 * field->get_acceleration(event, axis); 
 			}
 			
 			p[axis] = polynomial(2,c);
-			//cout << "advance[" << degree << "]: " << p[axis] << endl;
-			// ...
 		}
-		else if (degree < 2) // TODO check non negative 
+		else if (degree == 1) // TODO check non-negative 
 		{
-			double c[2];
-			c[0] = event->get_position(axis); // TODO move outside
-			c[1] = event->get_velocity(axis); // TODO move outside
-			//if (c[1] == 0 )
-			//	exit(0);
-			//pathlet->curve[axis] = polynomial(2, c);
+			double c[2] = {
+				event->get_position(axis), // TODO move outside
+				event->get_velocity(axis)  // TODO move outside
+			};
+			//if (c[1] == 0) exit(0); // not sure what the point of this is ...
 			p[axis] = polynomial(1,c);
-			//cout << "advance[" << degree << "]: " << p[axis] << endl;
-			// ...
 		}
 		else
-		{
-			// TODO support polynomial fields with direct integration
-			// TODO support 
-			cerr << "higher degrees not supported yet" << endl;
-			return 0;
+		{ 	// TODO support polynomial fields with direct integration
+			cerr << "A polynomial path degree of " << degree << " not supported." << endl;
+			abort();
 		}
 		// TODO look for any other solution type
+		//cout << "advance[" << degree << "]: " << p[axis] << endl;
 	}
 	
 	return new Pathlet(p);
@@ -127,6 +119,8 @@ int Simulation::run(double start_time, double stop_time, int count)
 //Path* Simulation::run(double start_time, double stop_time)
 bool Simulation::run(double start_time, double stop_time)
 {
+	cout << "passed to run: start_time = " << start_time << " stop_time = " << stop_time << endl;
+
 	Path* path = 0;
 	Source* source = 0;	
 	
@@ -142,28 +136,23 @@ bool Simulation::run(double start_time, double stop_time)
 	double random_strength = randomInterval();
 	for (s = sources.begin(); s != sources.end(); s++)
 	{
-		// calculate source strengths for different times ...
+		// TODO calculate source strengths for different times ...
 		// ...
 		// TODO pick a sources correctly
 		source = *s; // TODO fix this hack (only work with one source)
 	}
 	
-	//Particle* particle = source->get_new_particle(start_time, stop_time);
-	CreationEvent* start_event = 0;
 	if (not source) 
 	{
-		// TODO throw error ?
 		cerr << "no sources found" << endl;
-		return false;
+		abort(); // TODO throw error ?
 	}
 
-	start_event = source->create(start_time, stop_time);
-	
+	CreationEvent* start_event = source->create(start_time, stop_time);
 	if (not start_event)
 	{
-		// TODO throw error ?
 		cerr << "no creation event" << endl;
-		return false;
+		abort(); // TODO throw error ?
 	}
 
 	ParticleEvent* event = start_event;
@@ -172,7 +161,7 @@ bool Simulation::run(double start_time, double stop_time)
 	paths.push_back(path);
 	
 	// TODO Geometry* last_geormetry = source->getGeometry();
-	Geometry* last_geormetry = source->geometry;
+	Geometry* last_geometry = source->geometry;
 	
 	// TODO while (start_time < t < stop_time)	
 	int runs = 0;
@@ -184,21 +173,20 @@ bool Simulation::run(double start_time, double stop_time)
 		if (runs > 100) 
 			abort();
 		Pathlet* pathlet = 0;
-		Geometry* geometry = 0;
+		Geometry* best_geometry = 0;
 		InteractionEvent* best_interaction = 0;
 		
 		// ...
 		
-		// TODO? use solver: pathlet = solver->solve_path(prev_event);
+		// TODO use solver: pathlet = solver->solve_path(prev_event);
 		pathlet = advance(event);
 		if (!pathlet)
 		{
-			// TODO throw error?
 			cerr << "can't identify next event." << endl;
 			return false;
 		}
 
-		//double max_time = pathlet->stop_time; // wrong! not set yet
+		//double max_time = pathlet->stop_time; // XXX wrong! not set yet
 		double min_time = event->get_time();
 		double max_time = min_time + pathlet->get_relative_max_time();
 		
@@ -217,9 +205,10 @@ bool Simulation::run(double start_time, double stop_time)
 			event->out_of_bounds = true;
 			max_time = stop_time;
 			cout << "found end time " << max_time << " sec." << endl;
+			//break;
 		}
 		
-		// TODO handle decay events
+		// TODO handle decay events by setting maximum stop time early		
 		// TODO handle other loss events
 		// ...
 		
@@ -230,20 +219,22 @@ bool Simulation::run(double start_time, double stop_time)
 			//cout << "found an interactable geometry" << endl;
 			InteractionEvent* interaction = 0;
 			Geometry* this_geometry = *g;
-			//if (this_geometry == last_geormetry)
-			//	interaction = this_geometry->selfinteract(pathlet, min_time, max_time);
-			//else
+			if (this_geometry == last_geometry)
+				interaction = this_geometry->selfinteract(pathlet, min_time, max_time);
+			else
 				interaction = this_geometry->interact(pathlet, min_time, max_time);
 
 			if (interaction)
 			{
 				double t = interaction->get_time(); // TODO make sure this is computed relatively
-				cout << "Found interaction event at time " << t << " in window " << min_time << " to " << max_time << endl;
+				cout << "Found interaction event at time " << t;
+				cout << " in window " << min_time;
+				cout << " to " << max_time << endl;
 				if (t < max_time) // look for shortest time
 				{
 					cout << "found closest interaction" << endl;
 					max_time = t;
-					geometry = this_geometry;
+					best_geometry = this_geometry;
 					delete event;
 					event = interaction;
 					best_interaction = interaction;
@@ -269,18 +260,15 @@ bool Simulation::run(double start_time, double stop_time)
 		if (not event)
 		{
 			// no better intersection found? 
-			cout << "continuity." << endl;
+			cout << "creating continuity event" << endl;
 			event = new ContinuityEvent(max_time);
+
 			// TODO compute new position and velocity in public function 
+			double delta_time = max_time - min_time;
 			for (int i = 0; i < 3; i++)
 			{
-				event->position[i] = pathlet->curve[i].evaluate(max_time - min_time);
-				event->velocity[i] = pathlet->curve[i].derivative(max_time - min_time);
-			}
-			if (event->position[2] > 1.5)
-			{
-				cerr << "found odd continuity" << endl;
-				abort();
+				event->position[i] = pathlet->curve[i].evaluate(delta_time);
+				event->velocity[i] = pathlet->curve[i].derivative(delta_time);
 			}
 			running = true;
 			delete best_interaction;
@@ -288,18 +276,20 @@ bool Simulation::run(double start_time, double stop_time)
 		else if (event == best_interaction)
 		{
 			// TODO compute new position and velocity in public function 
+			double delta_time = max_time - min_time;
 			for (int i = 0; i < 3; i++)
 			{
-				event->position[i] = pathlet->curve[i].evaluate(max_time - min_time);
-				event->velocity[i] = pathlet->curve[i].derivative(max_time - min_time);
+				event->position[i] = pathlet->curve[i].evaluate(delta_time);
+				event->velocity[i] = pathlet->curve[i].derivative(delta_time);
 			}
-			//if (event->position[2] < 1.5 and event->position[2] > 0.5)
-			if (event->position[2] > 0.0)
+			cout << "interaction normal {";
+			for (int i = 0; i < 3; i++)
 			{
-				cerr << "found odd interaction" << endl;
-				abort();
+				cout << best_interaction->normal[i] <<" ";
 			}
+			cout << "}" << endl;
 			event->reflect_velocity(best_interaction->normal);
+			last_geometry = best_geometry;
 			running = true;
 		}
 
@@ -307,9 +297,8 @@ bool Simulation::run(double start_time, double stop_time)
 		int err_count = path->check(0.01);
 		if (err_count)
 		{
-			// TODO throw error?
 			cerr << "error appending new event to path" << endl;
-			return false;
+			abort();
 		}
 	}
 	return path;
@@ -370,7 +359,7 @@ void Simulation::writeMathematicaGraphics(ofstream &math_file, double start_writ
 	}
 /*
 */
-    math_file << "PlotRange -> {{-3, 3}, {-3,3}, {-3, 3}}" << endl;
+    math_file << "PlotRange -> {{-8, 8}, {-8,8}, {-8, 8}}" << endl;
 	math_file << "]" << endl;
 }
 // TODO add range to Visulisation class?
