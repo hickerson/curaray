@@ -47,7 +47,7 @@ Simulation::~Simulation() {}
 
 	
 // generate the next pathlet from the event using fields
-Pathlet* Simulation::advance(ParticleEvent *event)
+Pathlet* Simulation::advance(CreationEvent *event)
 {
 	// TODO seperate polynomial solutions from Runge-Kutta
 	polynomial p[3]; // TODO make dimensionality a parameter
@@ -155,7 +155,7 @@ bool Simulation::run(double start_time, double stop_time)
 		abort(); // TODO throw error ?
 	}
 
-	ParticleEvent* event = start_event;
+	CreationEvent* event = start_event;
 	path = new Path(event); // TODO add args
 	cout << "setting path start time to " << event->get_time() << " sec" << endl;
 	paths.push_back(path);

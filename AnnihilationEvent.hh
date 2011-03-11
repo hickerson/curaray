@@ -4,10 +4,11 @@
 #include <string>
 #include <iostream>
 #include "ParticleEvent.hh"
-#include "Path.hh"
+//#include "Path.hh"
 
 
 using namespace std;
+class Pathlet;
 
 /**
  * AnnihilationEvent
@@ -16,12 +17,14 @@ using namespace std;
  */
 class AnnihilationEvent : public ParticleEvent
 {
-	private:
-		Pathlet* before;
+	Pathlet* before;
+	double in[3];
 	
-	public:
-		// TODO AnnihilationEvent();
-		~AnnihilationEvent();
+public:
+	//AnnihilationEvent();
+	
+
+	//~AnnihilationEvent();
 };
 
 #endif

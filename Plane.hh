@@ -108,8 +108,8 @@ public:
 			if (t > stop_time)
 				return 0;
 
-			if (t > start_time + 0.000001)
-				return new InteractionEvent(t, this, normal);
+			if (t > start_time)
+				return new InteractionEvent(t, this, normal, pathlet, 0);
 		}
 
 		/*
@@ -164,7 +164,7 @@ public:
 				return 0;
 
 			if (t > start_time)
-				return new InteractionEvent(t, this, normal);
+				return new InteractionEvent(t, this, normal, pathlet, 0);
 		}
 
 		return 0;

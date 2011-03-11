@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -24,6 +25,8 @@ public:
 	{
 		return time;
 	};
+
+	virtual void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time) = 0;
 };
 
 

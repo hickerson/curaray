@@ -144,6 +144,15 @@ void Pathlet::getPosition(double time, double position[3]) const
 		position[i] = curve[i].evaluate((time - start_time)/scale);
 }
 
+void Pathlet::getVelocity(double time, double velocity[3]) const
+{
+    assert(time >= start_time);
+    assert(time <= stop_time);
+
+    for (int i = 0; i < 3; i++)
+		velocity[i] = curve[i].derivative((time - start_time)/scale);
+}
+
 //const double[3] & Path::getPosition(double time)
 void Path::getPosition(double time, double position[3])
 {
@@ -449,6 +458,11 @@ void Path::writeMathematicaGraphics(ofstream &math_file, double start_write_time
 		//                  + start_time;
 		//segment += 1.0;
 		pathlet->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
+		if (pathlet->stop_event)
+		{
+			math_file << ", " << endl;
+			stop_event->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
+		}
 		if (p != --pathlets.end())
 			math_file << ", " << endl;
 	}

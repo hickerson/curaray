@@ -111,6 +111,7 @@ public:
     Path(unsigned _count, double _t_start, double _t_stop);
 
     void getPosition(double time, double position[3]);
+    void getVelocity(double time, double velocity[3]);
     double getPosition(double start, double stop, double position[3]);
     double getMaximum(double start, double stop, const double direction[3]);
 
