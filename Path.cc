@@ -28,6 +28,7 @@ void Path::append(Pathlet* pathlet, Event* event)
 	//cout << "path stop_time = " << stop_time << endl;
 }
 
+/*
 void Path::append_continuity(Pathlet* pathlet, ContinuityEvent* event)
 {
 	double t = event->get_time() - stop_time;
@@ -51,6 +52,7 @@ void Path::append_interaction(Pathlet* pathlet, InteractionEvent* event)
 	event->reflect_velocity(event->normal);
 	append(pathlet,event);
 }
+*/
 
 /*
 Path::Path(unsigned _count, double _start_time, double _stop_time)

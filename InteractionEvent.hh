@@ -6,48 +6,55 @@
 #include "ContinuityEvent.hh"
 //#include "ParticleEvent.hh"
 //#include "Geometry.hh"
-//#include "Path.hh"
+#include "Path.hh"
 //#include "Surface.hh"
 
 
 using namespace std;
 
 class Geometry;
-class Pathlet;
+//class Pathlet;
 
 /**
  * InteractionEvent
  *
  * Author: Kevin Peter Hickerson
  */
-//class InteractionEvent : public ParticleEvent
 class InteractionEvent 
 	: public ContinuityEvent
+//	: public ParticleEvent
 {
 	const Geometry* geometry;
 	double normal[3];
 	//const Surface*  surface;
 	
 public:
-	InteractionEvent(double t, const Geometry* g, const double n[3], 
+	//InteractionEvent(double t, const Geometry* g, const double n[3], const x[3])
+	InteractionEvent(double t, const Geometry* g, const double n[3],
 					 Pathlet* path_in, Pathlet* path_out) 
-		: ContinuityEvent(t)
+		//: ContinuityEvent(t,x)
+		//: ParticleEvent(t, path_in, path_out)
+		: ContinuityEvent(t, path_in, path_out)
 		//: geometry(g), before(path_in), after(path_out), order(0)
 	{
-		time = t;
+		//time = t;
 		geometry = g;
-		before = path_in;
-		after = path_out;
+		//before = path_in;
+		//after = path_out;
 		order = 0;
-		assert(before);
-		before->getPosition(t, position);
-		before->getVelocity(t, in);
-    	double ni = dot(n,in);
-    	for (unsigned k = 0; k < 3; k++)
+		//before->getPosition(t, position);
+		//before->getVelocity(t, in);
+		if (before)
 		{
-    		out[k] = in[k] - 2*ni*n[k];
-			normal[k] = n[k];
+    		double ni = dot(n,in);
+    		for (unsigned k = 0; k < 3; k++)
+			{
+    			out[k] = in[k] - 2*ni*n[k];
+				normal[k] = n[k];
+			}
 		}
+		else
+			abort();
 	}
 
 	~InteractionEvent() {};

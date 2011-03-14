@@ -5,8 +5,9 @@
 #include <iostream>
 #include <fstream>
 //#include "Octree.hh"
-#include "ParticleEvent.hh"
-#include "CreationEvent.hh"
+//#include "ParticleEvent.hh"
+//#include "CreationEvent.hh"
+#include "InteractionEvent.hh"
 //#include "Volume.hh"
 //#include "Solid.hh"
 #include "Source.hh"
@@ -66,7 +67,7 @@ public: // i/o
 	void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop);
 
 private:
-	Pathlet* advance(CreationEvent *event); // generate the next pathlet from the event
+	Pathlet* advance(ContinuityEvent *event); // generate the next pathlet from the event
 };
 
 #endif

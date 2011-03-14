@@ -9,8 +9,9 @@
 #include <vector>
 
 #include "polynomial.hh"
-#include "InteractionEvent.hh"
-#include "ContinuityEvent.hh"
+//#include "InteractionEvent.hh"
+//#include "ContinuityEvent.hh"
+#include "Event.hh"
 
 #define MAX_ORDER 4
 
@@ -21,8 +22,25 @@
 
 using namespace std;
 
+
 /**
- * Path
+ * Vertex
+ * 
+ * Author: Kevin Peter Hickerson
+ *
+class Vertex
+{
+	Pathlet* before;
+	Pathlet* after;
+	double in[3];
+	double out[3];
+	Event* event;
+};
+*/
+
+
+/**
+ * Pathlet
  *
  * Author: Kevin Peter Hickerson
  */
@@ -43,6 +61,8 @@ public:
 public:
     Event* start_event;
     Event* stop_event;
+    //Vertex* start_event;
+    //Vertex* stop_event;
 
     //unsigned dim; // for now dim = 3
     //bool reflection;
@@ -78,6 +98,7 @@ public:
 
 public:
     void getPosition(double time, double position[3]) const ;
+    void getVelocity(double time, double velocity[3]) const ;
     void getStartPosition(double position[3]) const ;
     void getStopPosition(double position[3]) const ;
     double getMaximum(double start, double stop, const double direction[3]) const ;
@@ -94,10 +115,13 @@ struct Path
     //unsigned count; 
     vector<Pathlet*> 	pathlets;
 	vector<Event*>  	events;
+	//vector<Vertex*>  	events;
     double 				start_time;
     double 				stop_time;
 	Event* 				start_event;
 	Event* 				stop_event;
+	//Vertex* 				start_event;
+	//Vertex* 				stop_event;
 
 private:
     bool 		_visable;
@@ -118,8 +142,8 @@ public:
 	//void append(Event *event);
 	//void append(Pathlet *pathlet);
 	void append(Pathlet *pathlet, Event *event);
-	void append_continuity(Pathlet *pathlet, ContinuityEvent *event);
-	void append_interaction(Pathlet *pathlet, InteractionEvent *event);
+	//void append_continuity(Pathlet *pathlet, ContinuityEvent *event);
+	//void append_interaction(Pathlet *pathlet, InteractionEvent *event);
 
     int check();
     int check(double epsilon);

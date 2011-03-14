@@ -3,7 +3,8 @@
 
 #include "Particle.hh"
 #include "Geometry.hh"
-#include "CreationEvent.hh"
+//#include "CreationEvent.hh"
+#include "ContinuityEvent.hh"
 
 using namespace std;
 
@@ -64,7 +65,8 @@ public:
 	//virtual void get_new_particle(Particle* _particle);
 	//Geometry* getGeometry() { return *gemometry };
 
-	virtual CreationEvent* create(double start, double stop) const;
+	//virtual CreationEvent* create(double start, double stop) const;
+	virtual ContinuityEvent* create(double start, double stop) const;
 };
 
 

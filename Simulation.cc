@@ -1,8 +1,8 @@
 #include "Simulation.hh"
 #include "MonteCarlo.hh"
-#include "CreationEvent.hh"
-#include "AnnihilationEvent.hh"
-#include "ContinuityEvent.hh"
+//#include "CreationEvent.hh"
+//#include "AnnihilationEvent.hh"
+//#include "ContinuityEvent.hh"
 
 #include <iomanip>
 //Simulation::Simulation()
@@ -47,7 +47,7 @@ Simulation::~Simulation() {}
 
 	
 // generate the next pathlet from the event using fields
-Pathlet* Simulation::advance(CreationEvent *event)
+Pathlet* Simulation::advance(ContinuityEvent *event)
 {
 	// TODO seperate polynomial solutions from Runge-Kutta
 	polynomial p[3]; // TODO make dimensionality a parameter
@@ -68,7 +68,7 @@ Pathlet* Simulation::advance(CreationEvent *event)
 		{
 			double c[3] = {
 				event->get_position(axis), // TODO move outside
-				event->get_velocity(axis), // TODO move outside
+				event->get_out(axis), // TODO move outside
 				0
 			};
 			vector<Field*>::iterator f;
@@ -84,7 +84,7 @@ Pathlet* Simulation::advance(CreationEvent *event)
 		{
 			double c[2] = {
 				event->get_position(axis), // TODO move outside
-				event->get_velocity(axis)  // TODO move outside
+				event->get_out(axis)  // TODO move outside
 			};
 			//if (c[1] == 0) exit(0); // not sure what the point of this is ...
 			p[axis] = polynomial(1,c);
@@ -148,14 +148,16 @@ bool Simulation::run(double start_time, double stop_time)
 		abort(); // TODO throw error ?
 	}
 
-	CreationEvent* start_event = source->create(start_time, stop_time);
+	//CreationEvent* start_event = source->create(start_time, stop_time);
+	ContinuityEvent* start_event = source->create(start_time, stop_time);
 	if (not start_event)
 	{
 		cerr << "no creation event" << endl;
 		abort(); // TODO throw error ?
 	}
 
-	CreationEvent* event = start_event;
+	//CreationEvent* event = start_event;
+	ContinuityEvent* event = start_event;
 	path = new Path(event); // TODO add args
 	cout << "setting path start time to " << event->get_time() << " sec" << endl;
 	paths.push_back(path);
@@ -200,7 +202,8 @@ bool Simulation::run(double start_time, double stop_time)
 		if (max_time >= stop_time)
 		{
 			// TODO EndSimulationEvent
-			event = new ParticleEvent(stop_time);
+			//event = new ParticleEvent(stop_time);
+			event = new ContinuityEvent(stop_time, pathlet, 0);
 			running = false;
 			event->out_of_bounds = true;
 			max_time = stop_time;
@@ -264,7 +267,8 @@ bool Simulation::run(double start_time, double stop_time)
 			event = new ContinuityEvent(max_time);
 
 			// TODO compute new position and velocity in public function 
-			path->append_continuity(pathlet, (ContinuityEvent*)event);
+			//path->append_continuity(pathlet, (ContinuityEvent*)event);
+			path->append(pathlet, event);
 /*
 			double delta_time = max_time - min_time;
 			for (int i = 0; i < 3; i++)
@@ -279,7 +283,8 @@ bool Simulation::run(double start_time, double stop_time)
 		else if (event == best_interaction)
 		{
 			// TODO compute new position and velocity in public function 
-			path->append_interaction(pathlet, (InteractionEvent*)event);
+			//path->append_interaction(pathlet, (InteractionEvent*)event);
+			path->append(pathlet, (InteractionEvent*)event);
 /*
 			double delta_time = max_time - min_time;
 			for (int i = 0; i < 3; i++)

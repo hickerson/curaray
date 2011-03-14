@@ -6,7 +6,8 @@ double PowerLawSpectrum::get_random_momentum()
 	return randomPowerLaw(high, power) + offset;
 }
 
-CreationEvent* Source::create(double start, double stop) const
+//CreationEvent* Source::create(double start, double stop) const
+ContinuityEvent* Source::create(double start, double stop) const
 {
 		//double p[3];
 		//double q[3];
@@ -25,7 +26,8 @@ CreationEvent* Source::create(double start, double stop) const
 	for(int i=0; i<3; i++) // TODO support dimension
 		v[i] /= particle->mass;
 
-	return new CreationEvent(t, x, v);
+	//return new CreationEvent(t, x, v);
+	return new ContinuityEvent(t, x, v);
 }
 
 double Source::get_strength(double start_time, double stop_time)

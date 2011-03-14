@@ -110,6 +110,7 @@ public:
 
 			if (t > start_time)
 				return new InteractionEvent(t, this, normal, pathlet, 0);
+				//return new InteractionEvent(t, this, normal);
 		}
 
 		/*
@@ -165,6 +166,7 @@ public:
 
 			if (t > start_time)
 				return new InteractionEvent(t, this, normal, pathlet, 0);
+				//return new InteractionEvent(t, this, normal);
 		}
 
 		return 0;
