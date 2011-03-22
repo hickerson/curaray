@@ -21,22 +21,15 @@ class CreationEvent : public ParticleEvent
 	double out[3];
 	
 public:
-/*
 	CreationEvent(double t, double x[3], double v[3])
-	: ParticleEvent(t)
-	{
-		set_position(x);
-		set_velocity(v);
-	}
-*/
-	CreationEvent(double t, double x[3], double v[3])
-	: ParticleEvent(t,x)
+	: ParticleEvent(t,x,v)
 	{
 		//set_position(x);
-		set_velocity(v);
+		//set_velocity(v);
 	}
-	~CreationEvent();
+	//~CreationEvent();
 
+/*
 	double get_velocity(int i)
 	{
 		return out[i];
@@ -47,6 +40,7 @@ public:
 		for (int i=0; i<3; i++)
 			out[i] = v[i];
 	}
+*/
 };
 
 #endif

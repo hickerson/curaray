@@ -33,7 +33,9 @@ struct CentralForceField : public VectorField
     virtual void get_force (const Particle *particle,
 			                const double *field_value,
 			                double       *force_out);
-  	virtual int get_degree(const ParticleEvent* event, unsigned axis) 
+
+  	//virtual int get_degree(const ParticleEvent* event, unsigned axis) 
+  	virtual int get_degree(unsigned axis) 
   	{ 
 		cout << "not supported yet" << endl;
 		return 4; // TODO fix this shit! 
@@ -60,7 +62,8 @@ struct ConstantForceField : public VectorField
     virtual void get_force (const Particle *particle,
 			                const double *field_value,
 			                double       *force_out);
-  	virtual int get_degree(const ParticleEvent* event, unsigned axis) 
+  	//virtual int get_degree(const ParticleEvent* event, unsigned axis) 
+  	virtual int get_degree(unsigned axis) 
   	{
 		if (_gravity[axis] == 0)
 			return 0;

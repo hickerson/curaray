@@ -1,5 +1,6 @@
 #include "Source.hh"
 #include "MonteCarlo.hh"
+#include "Path.hh"
 
 double PowerLawSpectrum::get_random_momentum()
 {
@@ -7,7 +8,8 @@ double PowerLawSpectrum::get_random_momentum()
 }
 
 //CreationEvent* Source::create(double start, double stop) const
-ContinuityEvent* Source::create(double start, double stop) const
+//ContinuityEvent* Source::create(double start, double stop) const
+Vertex* Source::create_vertex(double start, double stop) const
 {
 		//double p[3];
 		//double q[3];
@@ -27,7 +29,7 @@ ContinuityEvent* Source::create(double start, double stop) const
 		v[i] /= particle->mass;
 
 	//return new CreationEvent(t, x, v);
-	return new ContinuityEvent(t, x, v);
+	return new Vertex(new CreationEvent(t,x,v), x, v);
 }
 
 double Source::get_strength(double start_time, double stop_time)

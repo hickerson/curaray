@@ -2,7 +2,58 @@
 #include <assert.h>
 
 
-//Path::Path(CreationEvent* event)
+// TODO a vertex stuff
+/*
+Path::Path(Event* event)
+{
+	events.push_back(event);
+	events.push_back(event);
+	start_event = event;
+	stop_event = event;
+	//start_time = event->time;
+	//stop_time = event->time;
+}
+*/
+
+Path::Path(Vertex* vertex)
+{
+	verticies.push_back(vertex);
+	verticies.push_back(vertex);
+	start = vertex;
+	stop = vertex;
+}
+
+// TODO a vertex stuff
+//void Path::append(Pathlet* pathlet, Event* event)
+/*
+void Path::append(polynomial p[3], Event* event)
+{
+	pathlets.push_back(pathlet);
+	events.push_back(event);
+	pathlet->start_event = stop_event;
+	pathlet->stop_event = event;
+	pathlet->start_time = stop_time;
+	stop = new Vertex(... event ...);
+	//stop_time = event->time;
+	//pathlet->stop_time = stop_time;
+	//cout << "pathlet->start_time = " << pathlet->start_time << endl;
+	//cout << "pathlet->stop_time = " << pathlet->stop_time << endl;
+	//cout << "path start_time = " << start_time << endl;
+	//cout << "path stop_time = " << stop_time << endl;
+}
+*/
+
+void Path::append(polynomial p[3], Vertex* vertex)
+{
+	pathlets.push_back(pathlet);
+	verticies.push_back(vertex);
+	pathlet->start = stop;
+	pathlet->stop = event;
+	//pathlet->start_time = stop_time;
+	stop = vertex;
+}
+
+/*
 Path::Path(Event* event)
 {
 	events.push_back(event);
@@ -27,6 +78,7 @@ void Path::append(Pathlet* pathlet, Event* event)
 	//cout << "path start_time = " << start_time << endl;
 	//cout << "path stop_time = " << stop_time << endl;
 }
+*/
 
 /*
 void Path::append_continuity(Pathlet* pathlet, ContinuityEvent* event)
@@ -187,6 +239,16 @@ void Path::getPosition(double time, double position[3])
 	*/
 	cerr << "request for range out of bound in getPosition" << endl;
     assert(false);
+}
+
+double Pathlet::get_start_time()
+{
+	return start->event->get_time();
+}
+
+double Pathlet::get_stop_time()
+{
+	return stop->event->get_time();
 }
 
 /*

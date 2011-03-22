@@ -47,7 +47,62 @@ Simulation::~Simulation() {}
 
 	
 // generate the next pathlet from the event using fields
-Pathlet* Simulation::advance(ContinuityEvent *event)
+Pathlet* Simulation::solve_pathlet(Vertex *vertex)
+{
+	// TODO seperate polynomial solutions from Runge-Kutta
+	polynomial p[3]; // TODO make dimensionality a parameter
+	
+	for (int axis = 0; axis < 3; axis++) // TODO make dimensionality a parameter
+    {
+		int degree = 1;
+		vector<Field*>::iterator f;
+		for (f = fields.begin(); f != fields.end(); f++)
+		{
+			Field* field = *f;
+			int d = field->get_degree(axis); // TODO support time varying fields
+			if (d > degree)
+				degree = d;	
+		}
+		
+		if (degree == 2)
+		{
+			double c[3] = {
+				vertex->get_position(axis), // TODO move outside
+				vertex->get_out(axis), // TODO move outside
+				0
+			};
+			vector<Field*>::iterator f;
+			for (f = fields.begin(); f != fields.end(); f++)
+			{
+				Field* field = *f; // TODO support time varying fields
+				c[2] += 0.5 * field->get_acceleration(event, axis); 
+			}
+			
+			p[axis] = polynomial(2,c);
+		}
+		else if (degree == 1) // TODO check non-negative 
+		{
+			double c[2] = {
+				vertex->get_position(axis), // TODO move outside
+				vertex->get_out(axis)  // TODO move outside
+			};
+			//if (c[1] == 0) exit(0); // not sure what the point of this is ...
+			p[axis] = polynomial(1,c);
+		}
+		else
+		{ 	// TODO support polynomial fields with direct integration
+			cerr << "A polynomial path degree of " << degree << " not supported." << endl;
+			abort();
+		}
+		// TODO look for any other solution type
+		//cout << "advance[" << degree << "]: " << p[axis] << endl;
+	}
+	
+	return new Pathlet(p);
+}
+	
+/*
+Pathlet* Simulation::advance(ParticleEvent *event)
 {
 	// TODO seperate polynomial solutions from Runge-Kutta
 	polynomial p[3]; // TODO make dimensionality a parameter
@@ -100,7 +155,8 @@ Pathlet* Simulation::advance(ContinuityEvent *event)
 	
 	return new Pathlet(p);
 }
-	
+*/
+
 // compute many paths
 //void Simulation::run(double start_time, double stop_time, int count, Path** paths)
 int Simulation::run(double start_time, double stop_time, int count)
@@ -149,16 +205,16 @@ bool Simulation::run(double start_time, double stop_time)
 	}
 
 	//CreationEvent* start_event = source->create(start_time, stop_time);
-	ContinuityEvent* start_event = source->create(start_time, stop_time);
-	if (not start_event)
+	//ParticleEvent* event = source->create(start_time, stop_time);
+	Vertex* vertex = source->create_vertex(start_time, stop_time);
+	//if (not event)
+	if (not vertex)
 	{
 		cerr << "no creation event" << endl;
 		abort(); // TODO throw error ?
 	}
 
-	//CreationEvent* event = start_event;
-	ContinuityEvent* event = start_event;
-	path = new Path(event); // TODO add args
+	path = new Path(vertex); // TODO add args
 	cout << "setting path start time to " << event->get_time() << " sec" << endl;
 	paths.push_back(path);
 	
@@ -181,11 +237,11 @@ bool Simulation::run(double start_time, double stop_time)
 		// ...
 		
 		// TODO use solver: pathlet = solver->solve_path(prev_event);
-		pathlet = advance(event);
+		pathlet = solve_pathlet(event);
 		if (!pathlet)
 		{
-			cerr << "can't identify next event." << endl;
-			return false;
+			cerr << "No pathlet. Can't identify next event." << endl;
+			abort();
 		}
 
 		//double max_time = pathlet->stop_time; // XXX wrong! not set yet
@@ -264,11 +320,12 @@ bool Simulation::run(double start_time, double stop_time)
 		{
 			// no better intersection found? 
 			cout << "creating continuity event" << endl;
-			event = new ContinuityEvent(max_time);
+			event = new ContinuityEvent(max_time, pathlet, 0);
 
 			// TODO compute new position and velocity in public function 
 			//path->append_continuity(pathlet, (ContinuityEvent*)event);
 			path->append(pathlet, event);
+			
 /*
 			double delta_time = max_time - min_time;
 			for (int i = 0; i < 3; i++)

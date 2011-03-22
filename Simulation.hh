@@ -67,7 +67,8 @@ public: // i/o
 	void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop);
 
 private:
-	Pathlet* advance(ContinuityEvent *event); // generate the next pathlet from the event
+	//Pathlet* solve_pathlet(ContinuityEvent *event); // generate the next pathlet from the event
+	Pathlet* solve_pathlet(Vertex *vertex); // generate the next pathlet from the event
 };
 
 #endif

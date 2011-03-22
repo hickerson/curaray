@@ -102,9 +102,9 @@ public:
 
 		for (int i = 0; i < n_roots; i++)
 		{
-			double t = root[i] + pathlet->start_time;
+			double t = root[i] + pathlet->get_start_time();
 			cout << root[i] << " + ";
-			cout << pathlet->start_time << endl;
+			cout << pathlet->get_start_time() << endl;
 			if (t > stop_time)
 				return 0;
 
@@ -160,7 +160,7 @@ public:
 
 		for (int i = 0; i < n_roots; i++)
 		{
-			double t = root[i] + pathlet->start_time;
+			double t = root[i] + pathlet->get_start_time();
 			if (t > stop_time)
 				return 0;
 
