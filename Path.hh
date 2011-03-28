@@ -63,6 +63,7 @@ public:
 	//Pathlet(Event* start, polynomial p[3]);
 	//Pathlet(Event* start, Event* stop, polynomial p[3]); 
 	//Pathlet(polynomial p[3]); 
+	Pathlet(polynomial p[3], Vertex* _start); 
 	Pathlet(polynomial p[3], Vertex* _start, Vertex* _stop); 
 	
 /*
@@ -201,7 +202,8 @@ public:
 	//void append(Event *event);
 	//void append(Pathlet *pathlet);
 	//void append(Pathlet *pathlet, Event *event);
-	void append(polynomial p[3], Event *e);
+	//void append(polynomial p[3], Event *e);
+	void append(Pathlet *pathlet, Vertex *v);
 	//void append_continuity(Pathlet *pathlet, ContinuityEvent *event);
 	//void append_interaction(Pathlet *pathlet, InteractionEvent *event);
 

@@ -9,8 +9,9 @@
 class Field 
 {
 public:
-	virtual int get_degree(const ParticleEvent* event, unsigned axis) = 0;
-	virtual double get_acceleration(const ParticleEvent* event, unsigned axis) = 0;
+	//virtual int get_degree(const ParticleEvent* event, unsigned axis) = 0;
+	virtual int get_degree(unsigned axis) = 0;
+	virtual double get_acceleration(const Event* event, unsigned axis) = 0;
 };
 
 class VectorField : public Field
@@ -41,7 +42,7 @@ struct CentralForceField : public VectorField
 		return 4; // TODO fix this shit! 
 	}
 	
-	virtual double get_acceleration(const ParticleEvent* event, unsigned axis)
+	virtual double get_acceleration(const Event* event, unsigned axis)
 	{
 		assert(false);
 	}
@@ -72,7 +73,7 @@ struct ConstantForceField : public VectorField
 	}
 	
 	// TODO to require event time and particle properties
-	virtual double get_acceleration(const ParticleEvent* event, unsigned axis)
+	virtual double get_acceleration(const Event* event, unsigned axis)
 	{
 		//cout << "_gravity[axis]" << _gravity[axis] <<endl;
 		return _gravity[axis];

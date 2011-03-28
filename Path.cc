@@ -17,7 +17,7 @@ Path::Path(Event* event)
 
 Path::Path(Vertex* vertex)
 {
-	verticies.push_back(vertex);
+	assert(vertex);
 	verticies.push_back(vertex);
 	start = vertex;
 	stop = vertex;
@@ -43,13 +43,13 @@ void Path::append(polynomial p[3], Event* event)
 }
 */
 
-void Path::append(polynomial p[3], Vertex* vertex)
+//void Path::append(polynomial p[3], Vertex* vertex)
+void Path::append(Pathlet* pathlet, Vertex* vertex)
 {
 	pathlets.push_back(pathlet);
 	verticies.push_back(vertex);
 	pathlet->start = stop;
-	pathlet->stop = event;
-	//pathlet->start_time = stop_time;
+	pathlet->stop = vertex;
 	stop = vertex;
 }
 
@@ -160,9 +160,17 @@ Pathlet::Pathlet(double _start_time,
 }
 */
 
-Pathlet::Pathlet(polynomial p[3])
-: scale(1), start_event(NULL), stop_event(NULL)
+Pathlet::Pathlet(polynomial p[3], Vertex* _start)
+: scale(1), start(_start), stop(0)
 {
+	for (int i = 0; i < 3; i++)
+		curve[i] = p[i];
+}
+
+Pathlet::Pathlet(polynomial p[3], Vertex* _start, Vertex* _stop)
+: scale(1), start(_start), stop(_stop)
+{
+	abort(); // TODO connect or make sure 
 	for (int i = 0; i < 3; i++)
 		curve[i] = p[i];
 }
@@ -191,35 +199,47 @@ void Pathlet::set(int axis, const polynomial &p)
 
 void Pathlet::getPosition(double time, double position[3]) const
 {
-    assert(time >= start_time);
-    assert(time <= stop_time);
+	assert(start);
+	assert(stop);
+	assert(start->event);
+	assert(stop->event);
+    assert(time >= start->event->get_time());
+    assert(time <= stop->event->get_time());
 
     for (int i = 0; i < 3; i++)
-		position[i] = curve[i].evaluate((time - start_time)/scale);
+		position[i] = curve[i].evaluate((time - start->event->time)/scale);
 }
 
 void Pathlet::getVelocity(double time, double velocity[3]) const
 {
-    assert(time >= start_time);
-    assert(time <= stop_time);
+	assert(start);
+	assert(stop);
+	assert(start->event);
+	assert(stop->event);
+    assert(time >= start->event->time);
+    assert(time <= stop->event->time);
 
     for (int i = 0; i < 3; i++)
-		velocity[i] = curve[i].derivative((time - start_time)/scale);
+		velocity[i] = curve[i].derivative((time - start->event->time)/scale);
 }
 
 //const double[3] & Path::getPosition(double time)
 void Path::getPosition(double time, double position[3])
 {
 	cout << "getPosition()" << endl;
-    assert(time >= start_time);
-    assert(time < stop_time);
+	assert(start);
+	assert(stop);
+	assert(start->event);
+	assert(stop->event);
+    assert(time >= start->event->get_time());
+    assert(time < stop->event->get_time());
 
 	vector<Pathlet*>::iterator p;
 	for (p = pathlets.begin(); p != pathlets.end(); p++)
     {
 		Pathlet* pathlet = *p;
-		if (time >= pathlet->start_time
-        and time <= pathlet->stop_time)
+		if (time >= pathlet->start->event->get_time()
+        and time <= pathlet->stop->event->get_time())
         {
 			cout << "getPosition()" << endl;
 	    	pathlet->getPosition(time, position);
@@ -243,11 +263,15 @@ void Path::getPosition(double time, double position[3])
 
 double Pathlet::get_start_time()
 {
+	assert(start);
+	assert(start->event);
 	return start->event->get_time();
 }
 
 double Pathlet::get_stop_time()
 {
+	assert(stop);
+	assert(stop->event);
 	return stop->event->get_time();
 }
 
@@ -342,21 +366,24 @@ int Path::check(double epsilon)
 	for (p = pathlets.begin(); p != pathlets.end(); p++)
     {
 		Pathlet* pathlet = *p;
-        double start = pathlet->start_time;
-        if (start > pathlet->stop_time)
+        double pathlet_start_time = pathlet->start->event->time;
+        double pathlet_stop_time = pathlet->start->event->time;
+		double start_time = start->event->time;
+		double stop_time = stop->event->time;
+        if (pathlet_start_time > pathlet_stop_time)
         {
             error_count++;
             cerr << "Pathlet start time is after stop time." << endl
 			     << "Pathlet start time is " << start << " sec and "
-                 << "Pathlet stop time is " << pathlet->stop_time << " sec." << endl
+                 << "Pathlet stop time is " << pathlet_stop_time << " sec." << endl
 				 << "Can't continue." << endl;
 			return error_count;
         }
-		pathlet->getPosition(start, position);
+		pathlet->getPosition(pathlet_start_time, position);
         //if (i == 0)
 		if (p == pathlets.begin())
         {
-            if (start != start_time)
+            if (pathlet_start_time != start_time)
             {
                 error_count++;
                 cerr << "The first sample start time "
@@ -367,12 +394,12 @@ int Path::check(double epsilon)
         }
         else
         {
-            if (start != last_time)
+            if (pathlet_start_time != last_time)
             {
                 error_count++;
                 cerr << "Sample " << /*i <<*/ " start time "
                      << "does not match the previous samples end time." << endl
-                     << "Sample start time is " << start << " sec and "
+                     << "Sample start time is " << start_time << " sec and "
                      << "previous sample stop time was " 
                      << last_time << " sec." << endl;
             }
@@ -429,32 +456,32 @@ int Path::check(double epsilon)
             }
         }
 
-        double stop = pathlet->stop_time;
+        //double stop = pathlet->stop->event->time;
 		//sample[i].getPosition(stop, last_position);
-        if (stop < pathlet->start_time)
+        if (pathlet_stop_time < pathlet_start_time)
         {
             error_count++;
             cerr << "Pathlet stop time is before start time." << endl
 			     << "Pathlet stop time is " << stop << " sec and "
-                 << "Pathlet start time is " << pathlet->start_time << " sec." << endl
+                 << "Pathlet start time is " << pathlet_start_time << " sec." << endl
 				 << "Can't continue." << endl;
 			return error_count;
         }
-		pathlet->getPosition(stop, last_position);
+		pathlet->getPosition(pathlet_stop_time, last_position);
 		//pathlet->getVelocity(stop, last_velocity);
         //if (i == pathlets.size())
 		if (p == pathlets.end())
         {
-            if (stop != stop_time)
+            if (pathlet_stop_time != stop_time)
             {
                 error_count++;
                 cerr << "the last sample stop time "
                      << "does not match the path stop time." << endl
-                     << "Last sample stop time is " << stop << " sec and "
+                     << "Last sample stop time is " << pathlet_stop_time << " sec and "
                      << "Path stop time is " << stop_time << " sec." << endl;
             }
         }
-        last_time = stop;
+        last_time = pathlet_stop_time;
     }
     if (error_count > 0)
     {
@@ -522,10 +549,10 @@ void Path::writeMathematicaGraphics(ofstream &math_file, double start_write_time
 		//                  + start_time;
 		//segment += 1.0;
 		pathlet->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
-		if (pathlet->stop_event)
+		if (pathlet->stop->event)
 		{
 			math_file << ", " << endl;
-			stop_event->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
+			stop->event->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
 		}
 		if (p != --pathlets.end())
 			math_file << ", " << endl;
@@ -536,5 +563,5 @@ void Pathlet::writeMathematicaGraphics(ofstream &math_file, double start_write_t
 {
 	// XXX math_file << "Graphics3D[{" << endl << "RGBColor[0,0,0], " << endl;
 	math_file << "ParametricPlot3D[{" << curve[0] << ", " << curve[1] << ", " << curve[2] << "}, ";
-	math_file << "{x, " << 0 << ", " << (stop_time - start_time) / scale << "}]";
+	math_file << "{x, " << 0 << ", " << (stop->event->time - start->event->time) / scale << "}]";
 }
