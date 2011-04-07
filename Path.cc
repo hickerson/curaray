@@ -46,6 +46,9 @@ void Path::append(polynomial p[3], Event* event)
 //void Path::append(polynomial p[3], Vertex* vertex)
 void Path::append(Pathlet* pathlet, Vertex* vertex)
 {
+	//assert(vertex->time - stop->time == pathlet->); 
+	assert(pathlet);
+	assert(vertex);
 	pathlets.push_back(pathlet);
 	verticies.push_back(vertex);
 	pathlet->start = stop;
@@ -163,8 +166,15 @@ Pathlet::Pathlet(double _start_time,
 Pathlet::Pathlet(polynomial p[3], Vertex* _start)
 : scale(1), start(_start), stop(0)
 {
+	double t = get_relative_max_time();
+	double x[3], v[3];
 	for (int i = 0; i < 3; i++)
+	{
 		curve[i] = p[i];
+		x[i] = p[i].evaluate(t);
+		v[i] = p[i].derivative(t);
+	}
+	stop = new Vertex(start->time + t, x ,v);
 }
 
 Pathlet::Pathlet(polynomial p[3], Vertex* _start, Vertex* _stop)

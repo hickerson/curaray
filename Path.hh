@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include "assert.h"
 
 #include "polynomial.hh"
 //#include "InteractionEvent.hh"
@@ -189,8 +190,7 @@ public:
 
 	void set_event(Event* _event)
 	{
-		if(not _event)
-			abort();
+		assert(_event);
 		event = _event;
 		time = event->time;
 	}

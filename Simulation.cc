@@ -229,8 +229,7 @@ bool Simulation::run(double start_time, double stop_time)
 	{
 		runs++;
 		cout << "runs " << runs << endl;
-		if (runs > 100) 
-			abort();
+		assert (runs < 100);
 		Pathlet* pathlet = 0;
 		Geometry* best_geometry = 0;
 		InteractionEvent* best_interaction = 0;
@@ -262,7 +261,7 @@ bool Simulation::run(double start_time, double stop_time)
 		{
 			max_time = stop_time;
 			// TODO EndSimulationEvent
-			vertex->set_event(0);
+			//vertex->set_event(0);
 			//vertex->event->out_of_bounds = true;
 			cout << "found end time " << max_time << " sec." << endl;
 			running = false;
