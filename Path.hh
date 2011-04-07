@@ -24,7 +24,6 @@ using namespace std;
 
 class Vertex;
 
-
 /**
  * Pathlet
  *
@@ -94,9 +93,9 @@ public:
     void noreflect();
 	void set(int axis, const polynomial &p);
 	double get_relative_max_time() {return 1;} // TODO replace with numerical stability calculation
-	void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time);
 	double get_start_time();
 	double get_stop_time();
+	void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time);
 };
 
 
@@ -108,18 +107,37 @@ public:
 class Vertex 
 {
 public:
+	double time;
 	double position[3];
 	double in[3];
 	double out[3];
 	Pathlet* before;
 	Pathlet* after;
 	unsigned order;
+
+private:
 	Event* event;
 	
 public:
+	Vertex(double _time, const double x[3], const double v[3])
+	{
+		time = _time;
+		event = 0;
+		before = 0;
+		after = 0;
+		order = 1;
+    	for (unsigned k = 0; k < 3; k++)
+		{
+    		position[k] = x[k];
+			in[k] = v[k];
+			out[k] = v[k];
+		}
+	}
+
 	Vertex(Event* _event, const double x[3], const double v[3])
 	{
 		event = _event;
+		time = event->time;
 		before = 0;
 		after = 0;
 		order = 1;
@@ -134,13 +152,14 @@ public:
 	Vertex(Event* _event , Pathlet* _before, Pathlet* _after) 
 	{
 		event = _event;
+		time = event->time;
 		before = _before;
 		after = _after;
 		order = 2;
 		if (before)
 		{
-			before->getPosition(event->get_time(), position);
-			before->getVelocity(event->get_time(), in);
+			before->getPosition(time, position);
+			before->getVelocity(time, in);
 		}
 		if (order > 0)
     		for (unsigned k = 0; k < 3; k++)
@@ -167,6 +186,16 @@ public:
 	{
 		return out[i];
 	}
+
+	void set_event(Event* _event)
+	{
+		if(not _event)
+			abort();
+		event = _event;
+		time = event->time;
+	}
+
+	void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time);
 };
  
 struct Path

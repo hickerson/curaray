@@ -76,7 +76,7 @@ Pathlet* Simulation::solve_pathlet(Vertex *vertex)
 			{
 				Field* field = *f; // TODO support time varying fields
 				//c[2] += 0.5 * field->get_acceleration(event, axis); 
-				c[2] += 0.5 * field->get_acceleration(vertex->event, axis); 
+				c[2] += 0.5 * field->get_acceleration(vertex, axis); 
 			}
 			
 			p[axis] = polynomial(2,c);
@@ -216,8 +216,7 @@ bool Simulation::run(double start_time, double stop_time)
 	}
 
 	path = new Path(vertex); // TODO add args
-	//cout << "setting path start time to " << event->get_time() << " sec" << endl;
-	cout << "setting path start time to " << vertex->event->get_time() << " sec" << endl;
+	cout << "setting path start time to " << vertex->time << " sec" << endl;
 	paths.push_back(path);
 	
 	// TODO Geometry* last_geormetry = source->getGeometry();
@@ -248,26 +247,25 @@ bool Simulation::run(double start_time, double stop_time)
 		}
 
 		//double max_time = pathlet->stop_time; // XXX wrong! not set yet
-		double min_time = vertex->event->get_time();
+		double min_time = vertex->time;
 		double max_time = min_time + pathlet->get_relative_max_time();
 		
-		cout << "event->get_time() = " << vertex->event->get_time() << endl;
+		cout << "vertex->time = " << vertex->time << endl;
 		cout << "pathlet->get_relative_max_time() = " << pathlet->get_relative_max_time() << endl;
 		cout << "max_time = " << max_time << endl;
 		cout << "stop_time = " << stop_time << endl;
 		
 		// check we are within the time interval
-		//event = 0;
-		vertex = 0;
+		Event* event = 0;
+		//vertex = 0;
 		if (max_time >= stop_time)
 		{
-			// TODO EndSimulationEvent
-			//event = new ParticleEvent(stop_time);
-			vertex->event = new ContinuityEvent(stop_time, pathlet, 0);
-			running = false;
-			//vertex->event->out_of_bounds = true;
 			max_time = stop_time;
+			// TODO EndSimulationEvent
+			vertex->set_event(0);
+			//vertex->event->out_of_bounds = true;
 			cout << "found end time " << max_time << " sec." << endl;
+			running = false;
 			//break;
 		}
 		
@@ -289,7 +287,7 @@ bool Simulation::run(double start_time, double stop_time)
 
 			if (interaction)
 			{
-				double t = interaction->get_time(); // TODO make sure this is computed relatively
+				double t = interaction->time; // TODO make sure this is computed relatively
 				cout << "Found interaction event at time " << t;
 				cout << " in window " << min_time;
 				cout << " to " << max_time << endl;
@@ -298,9 +296,9 @@ bool Simulation::run(double start_time, double stop_time)
 					cout << "found closest interaction" << endl;
 					max_time = t;
 					best_geometry = this_geometry;
-					delete vertex;
-					vertex->event = interaction;
+					//delete vertex;
 					best_interaction = interaction;
+					vertex->set_event(interaction);
 				}
 				else
 					delete interaction;
@@ -313,22 +311,22 @@ bool Simulation::run(double start_time, double stop_time)
 		if (out_of_bounds) 
 		{
 			cout << "out of bounds" << endl;
-			delete vertex;
-			vertex->event = out_of_bounds;
-			//vertex->event->out_of_bounds = true;
-			max_time = vertex->event->get_time();
+			//delete vertex;
+			vertex->set_event(out_of_bounds);
+			out_of_bounds->out_of_bounds = true;
+			max_time = vertex->time;
 			running = false;
 		}
 		
-		if (not vertex->event)
+		if (not (best_interaction or out_of_bounds))
 		{
 			// no better intersection found? 
 			cout << "creating continuity event" << endl;
-			vertex->event = new ContinuityEvent(max_time, pathlet, 0);
+			vertex->set_event(new ContinuityEvent(max_time, pathlet, 0));
 
 			// TODO compute new position and velocity in public function 
 			//path->append_continuity(pathlet, (ContinuityEvent*)event);
-			path->append(pathlet, vertex);
+			//path->append(pathlet, vertex); now done below
 /*
 			double delta_time = max_time - min_time;
 			for (int i = 0; i < 3; i++)
@@ -340,11 +338,12 @@ bool Simulation::run(double start_time, double stop_time)
 			running = true;
 			delete best_interaction;
 		}
-		else if (vertex->event == best_interaction)
+		//else if (vertex->event == best_interaction)
+		else
 		{
 			// TODO compute new position and velocity in public function 
 			//path->append_interaction(pathlet, (InteractionEvent*)event);
-			path->append(pathlet, vertex);
+			//path->append(pathlet, vertex);
 /*
 			double delta_time = max_time - min_time;
 			for (int i = 0; i < 3; i++)
@@ -361,8 +360,8 @@ bool Simulation::run(double start_time, double stop_time)
 			last_geometry = best_geometry;
 			running = true;
 		}
-		else
-			path->append(pathlet, vertex);
+
+		path->append(pathlet, vertex);
 
 		int err_count = path->check(0.01);
 		if (err_count)

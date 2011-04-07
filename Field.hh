@@ -4,6 +4,7 @@
 //#include "Octree.hh"
 #include "Particle.hh"
 #include "ParticleEvent.hh"
+#include "Path.hh"
 #include <assert.h>
 
 class Field 
@@ -11,14 +12,16 @@ class Field
 public:
 	//virtual int get_degree(const ParticleEvent* event, unsigned axis) = 0;
 	virtual int get_degree(unsigned axis) = 0;
-	virtual double get_acceleration(const Event* event, unsigned axis) = 0;
+	virtual double get_acceleration(const Vertex* vertex, unsigned axis) = 0;
 };
 
+/*
 class VectorField : public Field
 {
 };
+*/
 
-struct CentralForceField : public VectorField
+struct CentralForceField : public Field
 {
     double _center[3];
     double _mass;
@@ -42,13 +45,10 @@ struct CentralForceField : public VectorField
 		return 4; // TODO fix this shit! 
 	}
 	
-	virtual double get_acceleration(const Event* event, unsigned axis)
-	{
-		assert(false);
-	}
+	virtual double get_acceleration(const Vertex* vertex, unsigned axis);
 };
 
-struct ConstantForceField : public VectorField
+struct ConstantForceField : public Field
 {
     double _gravity[3];
 
@@ -64,20 +64,10 @@ struct ConstantForceField : public VectorField
 			                const double *field_value,
 			                double       *force_out);
   	//virtual int get_degree(const ParticleEvent* event, unsigned axis) 
-  	virtual int get_degree(unsigned axis) 
-  	{
-		if (_gravity[axis] == 0)
-			return 0;
-		else 
-			return 2;
-	}
+  	virtual int get_degree(unsigned axis);
 	
 	// TODO to require event time and particle properties
-	virtual double get_acceleration(const Event* event, unsigned axis)
-	{
-		//cout << "_gravity[axis]" << _gravity[axis] <<endl;
-		return _gravity[axis];
-	}
+	virtual double get_acceleration(const Vertex* vertex, unsigned axis);
 };
 
 #endif

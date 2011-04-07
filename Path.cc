@@ -170,7 +170,8 @@ Pathlet::Pathlet(polynomial p[3], Vertex* _start)
 Pathlet::Pathlet(polynomial p[3], Vertex* _start, Vertex* _stop)
 : scale(1), start(_start), stop(_stop)
 {
-	abort(); // TODO connect or make sure 
+	assert(start);
+	assert(stop);
 	for (int i = 0; i < 3; i++)
 		curve[i] = p[i];
 }
@@ -201,27 +202,42 @@ void Pathlet::getPosition(double time, double position[3]) const
 {
 	assert(start);
 	assert(stop);
-	assert(start->event);
-	assert(stop->event);
-    assert(time >= start->event->get_time());
-    assert(time <= stop->event->get_time());
+    assert(time >= start->time);
+    assert(time <= stop->time);
 
     for (int i = 0; i < 3; i++)
-		position[i] = curve[i].evaluate((time - start->event->time)/scale);
+		position[i] = curve[i].evaluate((time - start->time)/scale);
 }
 
 void Pathlet::getVelocity(double time, double velocity[3]) const
 {
 	assert(start);
 	assert(stop);
-	assert(start->event);
-	assert(stop->event);
-    assert(time >= start->event->time);
-    assert(time <= stop->event->time);
+    assert(time >= start->time);
+    assert(time <= stop->time);
 
     for (int i = 0; i < 3; i++)
-		velocity[i] = curve[i].derivative((time - start->event->time)/scale);
+		velocity[i] = curve[i].derivative((time - start->time)/scale);
 }
+
+
+double Pathlet::get_start_time()
+{
+	assert(start);
+	return start->time;
+}
+
+double Pathlet::get_stop_time()
+{
+	assert(stop);
+	return stop->time;
+}
+
+void Vertex::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
+{
+	event->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
+}
+
 
 //const double[3] & Path::getPosition(double time)
 void Path::getPosition(double time, double position[3])
@@ -229,17 +245,17 @@ void Path::getPosition(double time, double position[3])
 	cout << "getPosition()" << endl;
 	assert(start);
 	assert(stop);
-	assert(start->event);
-	assert(stop->event);
-    assert(time >= start->event->get_time());
-    assert(time < stop->event->get_time());
+    assert(time >= start->time);
+    assert(time < stop->time);
 
 	vector<Pathlet*>::iterator p;
 	for (p = pathlets.begin(); p != pathlets.end(); p++)
     {
 		Pathlet* pathlet = *p;
-		if (time >= pathlet->start->event->get_time()
-        and time <= pathlet->stop->event->get_time())
+		double start_time = pathlet->start->time;
+        double stop_time = pathlet->stop->time;
+
+		if (time >= start_time and time <= stop_time)
         {
 			cout << "getPosition()" << endl;
 	    	pathlet->getPosition(time, position);
@@ -260,21 +276,6 @@ void Path::getPosition(double time, double position[3])
 	cerr << "request for range out of bound in getPosition" << endl;
     assert(false);
 }
-
-double Pathlet::get_start_time()
-{
-	assert(start);
-	assert(start->event);
-	return start->event->get_time();
-}
-
-double Pathlet::get_stop_time()
-{
-	assert(stop);
-	assert(stop->event);
-	return stop->event->get_time();
-}
-
 /*
 double Path::getPosition(double start, double stop, double position[3])
 {
@@ -366,10 +367,10 @@ int Path::check(double epsilon)
 	for (p = pathlets.begin(); p != pathlets.end(); p++)
     {
 		Pathlet* pathlet = *p;
-        double pathlet_start_time = pathlet->start->event->time;
-        double pathlet_stop_time = pathlet->start->event->time;
-		double start_time = start->event->time;
-		double stop_time = stop->event->time;
+        double pathlet_start_time = pathlet->start->time;
+        double pathlet_stop_time = pathlet->start->time;
+		double start_time = start->time;
+		double stop_time = stop->time;
         if (pathlet_start_time > pathlet_stop_time)
         {
             error_count++;
@@ -549,10 +550,10 @@ void Path::writeMathematicaGraphics(ofstream &math_file, double start_write_time
 		//                  + start_time;
 		//segment += 1.0;
 		pathlet->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
-		if (pathlet->stop->event)
+		if (pathlet->stop)
 		{
 			math_file << ", " << endl;
-			stop->event->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
+			stop->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
 		}
 		if (p != --pathlets.end())
 			math_file << ", " << endl;
@@ -563,5 +564,5 @@ void Pathlet::writeMathematicaGraphics(ofstream &math_file, double start_write_t
 {
 	// XXX math_file << "Graphics3D[{" << endl << "RGBColor[0,0,0], " << endl;
 	math_file << "ParametricPlot3D[{" << curve[0] << ", " << curve[1] << ", " << curve[2] << "}, ";
-	math_file << "{x, " << 0 << ", " << (stop->event->time - start->event->time) / scale << "}]";
+	math_file << "{x, " << 0 << ", " << (stop->time - start->time) / scale << "}]";
 }

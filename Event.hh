@@ -21,10 +21,7 @@ public:
 		: time(_time) {};
 	~Event() {};
 	
-	double get_time() 
-	{
-		return time;
-	};
+	//double get_time();
 
 	virtual void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time) = 0;
 };

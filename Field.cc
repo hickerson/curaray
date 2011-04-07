@@ -1,6 +1,11 @@
 #include "Field.hh"
 
-#define a_tolerance 0.0001 // TODO calculate tolerances
+#define a_tolerance 0.0001 // TODO calculate tolerances corectly
+
+double CentralForceField::get_acceleration(const Vertex* vertex, unsigned axis)
+{
+	assert(false);
+}
 
 CentralForceField::CentralForceField(const double *center,
 		                         double mass) 
@@ -91,4 +96,19 @@ void ConstantForceField::get_force (const Particle *particle,
     // f = m * a
     for(int i = 0; i < 3; i++)
     	force_out[i] = particle->mass * field_value[i];
+}
+
+int ConstantForceField::get_degree(unsigned axis) 
+{
+	if (_gravity[axis] == 0)
+		return 0;
+	else 
+		return 2;
+}
+
+// TODO to require vertex time and particle properties
+double ConstantForceField::get_acceleration(const Vertex* vertex, unsigned axis)
+{
+	//cout << "_gravity[axis]" << _gravity[axis] <<endl;
+	return _gravity[axis];
 }
