@@ -322,18 +322,9 @@ bool Simulation::run(double start_time, double stop_time)
 			// no better intersection found? 
 			cout << "creating continuity event" << endl;
 			vertex->set_event(new ContinuityEvent(max_time, pathlet, 0));
-
-			// TODO compute new position and velocity in public function 
 			//path->append_continuity(pathlet, (ContinuityEvent*)event);
 			//path->append(pathlet, vertex); now done below
-/*
-			double delta_time = max_time - min_time;
-			for (int i = 0; i < 3; i++)
-			{
-				event->position[i] = pathlet->curve[i].evaluate(delta_time);
-				event->velocity[i] = pathlet->curve[i].derivative(delta_time);
-			}
-*/
+
 			running = true;
 			delete best_interaction;
 		}
