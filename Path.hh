@@ -188,11 +188,13 @@ public:
 		return out[i];
 	}
 
-	void set_event(Event* _event)
+	void set_event(Event* _event);
 	{
 		assert(_event);
 		event = _event;
 		time = event->time;
+		for (int i=0; i<3; i++)
+			position[i] = x[i];
 	}
 
 	void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time);
