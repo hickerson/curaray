@@ -298,7 +298,7 @@ bool Simulation::run(double start_time, double stop_time)
 					best_geometry = this_geometry;
 					//delete vertex;
 					best_interaction = interaction;
-					vertex->set_event(interaction);
+					//vertex->set_event(interaction);
 				}
 				else
 					delete interaction;
@@ -318,7 +318,7 @@ bool Simulation::run(double start_time, double stop_time)
 			running = false;
 		}
 		
-		if (not best_interaction or not out_of_bounds)
+		if (not best_interaction or out_of_bounds)
 		{ 	// no better intersection found? 
 			cout << "creating continuity event" << endl;
 			vertex->set_event(new ContinuityEvent(max_time, pathlet, 0));

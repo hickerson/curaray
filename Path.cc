@@ -245,6 +245,7 @@ double Pathlet::get_stop_time()
 
 void Vertex::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
 {
+	assert(event);
 	event->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
 }
 
@@ -371,16 +372,16 @@ int Path::check(double epsilon)
     double last_position[3];
     double last_velocity[3];
     double position[3];
-    double last_time;
+	double start_time = start->time;
+	double stop_time = stop->time;
+    double last_time = start_time;
     //int i = 0;
 	vector<Pathlet*>::iterator p;
 	for (p = pathlets.begin(); p != pathlets.end(); p++)
     {
 		Pathlet* pathlet = *p;
         double pathlet_start_time = pathlet->start->time;
-        double pathlet_stop_time = pathlet->start->time;
-		double start_time = start->time;
-		double stop_time = stop->time;
+        double pathlet_stop_time = pathlet->stop->time;
         if (pathlet_start_time > pathlet_stop_time)
         {
             error_count++;
@@ -410,9 +411,10 @@ int Path::check(double epsilon)
                 error_count++;
                 cerr << "Sample " << /*i <<*/ " start time "
                      << "does not match the previous samples end time." << endl
-                     << "Sample start time is " << start_time << " sec and "
+                     << "Sample start time is " << pathlet_start_time << " sec and "
                      << "previous sample stop time was " 
-                     << last_time << " sec." << endl;
+                     << last_time << " sec." << endl
+					 << "difference is " << pathlet_start_time - last_time << endl;
             }
             else
             {
