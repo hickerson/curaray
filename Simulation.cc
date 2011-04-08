@@ -244,12 +244,13 @@ bool Simulation::run(double start_time, double stop_time)
 			cerr << "No pathlet. Can't identify next event." << endl;
 			abort();
 		}
+		double min_time = vertex->time;
+		cout << "vertex->time = " << vertex->time << endl;
+		vertex = pathlet->stop;
+		double max_time = vertex->time;
 
 		//double max_time = pathlet->stop_time; // XXX wrong! not set yet
-		double min_time = vertex->time;
-		double max_time = min_time + pathlet->get_relative_max_time();
 		
-		cout << "vertex->time = " << vertex->time << endl;
 		cout << "pathlet->get_relative_max_time() = " << pathlet->get_relative_max_time() << endl;
 		cout << "max_time = " << max_time << endl;
 		cout << "stop_time = " << stop_time << endl;
