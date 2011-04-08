@@ -550,6 +550,7 @@ unsigned Path::discontinuities()
 void Path::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
 {
 	// determine starting pathlet
+	assert(stop_write_time > start_write_time);
 	vector<Pathlet*>::iterator p;
 	for (p = pathlets.begin(); p != pathlets.end(); p++)
 	{
@@ -572,7 +573,10 @@ void Path::writeMathematicaGraphics(ofstream &math_file, double start_write_time
 
 void Pathlet::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
 {
-	// XXX math_file << "Graphics3D[{" << endl << "RGBColor[0,0,0], " << endl;
+	assert(stop_write_time > start_write_time);
+	assert(scale > 0);
 	math_file << "ParametricPlot3D[{" << curve[0] << ", " << curve[1] << ", " << curve[2] << "}, ";
 	math_file << "{x, " << 0 << ", " << (stop->time - start->time) / scale << "}]";
+	cout << stop->time << " " << start->time << " " << scale << endl;
+	cout << "{x, " << 0 << ", " << (stop->time - start->time) / scale << "}]";
 }

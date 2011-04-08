@@ -265,7 +265,7 @@ bool Simulation::run(double start_time, double stop_time)
 			//vertex->event->out_of_bounds = true;
 			cout << "found end time " << max_time << " sec." << endl;
 			running = false;
-			//break;
+			break;
 		}
 		
 		// TODO handle decay events by setting maximum stop time early		
@@ -317,36 +317,15 @@ bool Simulation::run(double start_time, double stop_time)
 			running = false;
 		}
 		
-		if (not (best_interaction or out_of_bounds))
-		{
-			// no better intersection found? 
+		if (not best_interaction or not out_of_bounds)
+		{ 	// no better intersection found? 
 			cout << "creating continuity event" << endl;
 			vertex->set_event(new ContinuityEvent(max_time, pathlet, 0));
-			//path->append_continuity(pathlet, (ContinuityEvent*)event);
-			//path->append(pathlet, vertex); now done below
-
 			running = true;
 			delete best_interaction;
 		}
-		//else if (vertex->event == best_interaction)
 		else
 		{
-			// TODO compute new position and velocity in public function 
-			//path->append_interaction(pathlet, (InteractionEvent*)event);
-			//path->append(pathlet, vertex);
-/*
-			double delta_time = max_time - min_time;
-			for (int i = 0; i < 3; i++)
-			{
-				event->position[i] = pathlet->curve[i].evaluate(delta_time);
-				event->velocity[i] = pathlet->curve[i].derivative(delta_time);
-			}
-			cout << "interaction normal {";
-			cout << best_interaction->normal[0] <<", ";
-			cout << best_interaction->normal[1] <<", ";
-			cout << best_interaction->normal[2] << "}" << endl;
-			event->reflect_velocity(best_interaction->normal);
-*/
 			last_geometry = best_geometry;
 			running = true;
 		}
