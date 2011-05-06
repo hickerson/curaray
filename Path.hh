@@ -116,6 +116,15 @@ public:
 	Pathlet* after;
 	unsigned order;
 
+    enum vertexType {
+        continuous,
+        begining,
+        end,
+        branch,
+        reflection,
+        interacting
+    };
+
 private:
 	Event* event;
 	
@@ -188,14 +197,52 @@ public:
 		return out[i];
 	}
 
-	void set_event(Event* _event);
+	void set_event(Event* _event)
+    {
+		assert(_event);
+		event = _event;
+		time = event->time;
+    }
+
+	void set_before(Pathlet* _before) 
+	{
+		before = _before;
+		if (before)
+		{
+			before->getPosition(time, position);
+			before->getVelocity(time, in);
+		}
+	}
+
+	void set_after(Pathlet* _before) 
+	{
+		after = _after;
+		if (after)
+		{
+			after->getPosition(time, position);
+			before->getVelocity(time, in);
+		}
+	}
+
+/*
+	void set_all(Event* _event, Pathlet* _before, Pathlet* _after) 
 	{
 		assert(_event);
 		event = _event;
 		time = event->time;
-		for (int i=0; i<3; i++)
-			position[i] = x[i];
+		before = _before;
+		after = _after;
+		order = 2;
+		if (before)
+		{
+			before->getPosition(time, position);
+			before->getVelocity(time, in);
+		}
+		if (order > 0)
+    		for (unsigned k = 0; k < 3; k++)
+    			out[k] = in[k];
 	}
+*/
 
 	void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time);
 };

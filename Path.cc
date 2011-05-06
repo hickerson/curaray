@@ -54,6 +54,7 @@ void Path::append(Pathlet* pathlet, Vertex* vertex)
 	pathlet->start = stop;
 	pathlet->stop = vertex;
 	stop = vertex;
+    vertex->set(pathlet,0);
 }
 
 /*
@@ -392,7 +393,6 @@ int Path::check(double epsilon)
 			return error_count;
         }
 		pathlet->getPosition(pathlet_start_time, position);
-        //if (i == 0)
 		if (p == pathlets.begin())
         {
             if (pathlet_start_time != start_time)
@@ -429,7 +429,7 @@ int Path::check(double epsilon)
                 if (position_error_count)
                 {
                     error_count++;
-                    cerr << "Sample " << /*i <<*/ " start position did not match "
+                    cerr << "Sample start position did not match "
                          << "previous sample end position." << endl;
                     cerr << "Sample start position is " << "(" 
                          << position[0] << ", "
