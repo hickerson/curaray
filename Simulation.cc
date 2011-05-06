@@ -87,7 +87,7 @@ Pathlet* Simulation::solve_pathlet(Vertex *vertex)
                 vertex->get_position(axis), // TODO move outside
                 vertex->get_out(axis)  // TODO move outside
             };
-            //if (c[1] == 0) exit(0); // not sure what the point of this is ...
+            if (c[1] == 0) exit(0); // not sure what the point of this is ...
             p[axis] = polynomial(1,c);
         }
         else
@@ -256,7 +256,7 @@ bool Simulation::run(double start_time, double stop_time)
             // TODO EndSimulationEvent
             //vertex->set_event(0);
             //vertex->event->out_of_bounds = true;
-            cout << "found end time " << max_time << " sec." << endl;
+            cout << "Found end time " << max_time << " sec." << endl;
             running = false;
             break;
         }
@@ -300,7 +300,7 @@ bool Simulation::run(double start_time, double stop_time)
         InteractionEvent* out_of_bounds = volume->interact(pathlet, min_time, max_time);
         if (out_of_bounds) 
         {   // terminate path since we didn't hit an object
-            cout << "out of bounds" << endl;
+            cout << "Path out of bounds." << endl;
             best_event = out_of_bounds;
             out_of_bounds->out_of_bounds = true; // TODO add to constructor
             max_time = vertex->time;
@@ -310,13 +310,13 @@ bool Simulation::run(double start_time, double stop_time)
         {
             if (best_interaction)
             {
-                cout << "found best interaction" << endl;
+                cout << "Found best interaction." << endl;
                 best_event = best_interaction;
                 last_geometry = best_geometry;
             }
             else
             { 	// no better intersection found? 
-                cout << "creating continuity event" << endl;
+                cout << "Creating continuity event at time " << max_time << " sec." << endl;
                 best_event = new ContinuityEvent(max_time, pathlet, 0);
             }
             running = true;
@@ -329,7 +329,7 @@ bool Simulation::run(double start_time, double stop_time)
         int err_count = path->check(0.01);
         if (err_count)
         {
-            cerr << "error appending new event to path." << endl;
+            cerr << "Error appending new event to path." << endl;
             abort();
         }
     } // end main running loop
