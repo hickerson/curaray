@@ -3,18 +3,58 @@
 
 #include <string>
 #include <iostream>
+#include "Event.hh"
 
-using namespace std;
+class Pathlet;
 
 /**
  * Vertex
- *
+ * 
  * Author: Kevin Peter Hickerson
+ * Date: May 6, 2011
+ * Note: Code moved to this file on creation date. Class written earlier. Used to be in Path.[hh,cc]
  */
-class Vertex
+class Vertex 
 {
-	Vertex();
-	~Vertex();
-};
+public:
+	double time;
+	double position[3];
+	double in[3];
+	double out[3];
+	Pathlet* before;
+	Pathlet* after;
+	unsigned order;
 
+    enum vertexType {
+        continuous,
+        begining,
+        end,
+        branch,
+        reflection,
+        interacting
+    };
+
+private:
+	Event* event;
+	
+public:
+	Vertex(double _time, const double x[3], const double v[3]);
+	Vertex(Event* _event, const double x[3], const double v[3]);
+	Vertex(Event* _event , Pathlet* _before, Pathlet* _after);
+
+	double get_position(int i);
+	void set_position(double x[3]);
+	double get_in(int i);
+	double get_out(int i);
+	void get_in(double p[3]);
+	void get_out(double p[3]);
+	void set_in(const double p[3]);
+	void set_out(const double p[3]);
+	void set_event(Event* _event);
+	void set_before(Pathlet* _before);
+	void set_after(Pathlet* _after);
+	//void set_all(Event* _event, Pathlet* _before, Pathlet* _after);
+
+	void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time);
+};
 #endif

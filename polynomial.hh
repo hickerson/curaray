@@ -93,166 +93,178 @@ public:
 	{
 		return _degree;
 	}
-	// TODO define math operators
-	
-	// expecting an array of size degree
-	int solve_real_roots(double* root)
-	{
-		cout << *this << endl;
-		//cout << _degree <<endl;
-		if (_degree == 0)
-			return 0;
-		else if (_degree == 1)
-		{
-			double a = _c[1];
-			double b = _c[0];
-			if (a)
-			{
-				root[0] = -b/a;
-				return 1;
-			}
-			else
-				return 0;
-		}
-		else if (_degree == 2)
-			return gsl_poly_solve_quadratic(_c[2], _c[1], _c[0], root, root+1);
-	}
-	
-	const polynomial& operator=(const polynomial& p)
-	{
-		_degree = p._degree;
-		delete [] _c;
-		_c = new double[_degree + 1];
-	
-		for (int i = _degree; i >= 0; i--)
-			_c[i] = p._c[i];
-		
-		return p;
-	}
-	
-	polynomial& operator=(double d)
-	{
-		_degree = 0;
-		delete [] _c;
-		_c = new double[1];
-		_c[0] = d;
-		return *this;
-	}
-	
-	polynomial& operator<<=(int s)
-	{
-		_degree -= s;
-		double* __c = new double[_degree + 1 - s];
-		for (int i = 0; i <= _degree; i++)
-			__c[i] = _c[i + s];
+    // TODO define math operators
 
-		delete [] _c;
-		_c = __c;
-		return *this;
-	}
+    // expecting an array of size degree
+    int solve_real_roots(double* root)
+    {
+        cout << *this << endl;
+        switch (_degree)
+        {
+            case 0:
+                return 0;
+                break;
 
-	polynomial& operator*=(double d)
-	{
-		for (int n = _degree; n >=0; n--)
-			_c[n] *= d;
+            case 1:
+                {
+                    double a = _c[1];
+                    double b = _c[0];
+                    if (a)
+                    {
+                        root[0] = -b/a;
+                        return 1;
+                    }
+                    else
+                        return 0;
+                }
+                break;
 
-		return *this;
-	}
-	
-	polynomial& operator*=(const polynomial& p)
-	{
-		if (p._degree > 0)
-		{
-			// must resize for multiplier of degree >1
-			int __degree = p._degree + _degree;
-			double* __c = new double[__degree + 1];
+            case 2:
+                return gsl_poly_solve_quadratic(_c[2], _c[1], _c[0], root, root+1);
+                break;
 
-			// initialize coefficients
-			for (int n = 0; n <= __degree; n++)
-				__c[n] = 0;
+            default:
+                abort();
+                return 0;
+                break;
+        }
+    }
 
-			// expand sum
-			for (int i = 0; i <= __degree; i++)
-				for (int j = _degree; j < __degree - i; j++)
-					__c[i] += p._c[i-j] * _c[j];
-			
-			// free up old copy and transfer new memory
-			delete [] _c;
-			_degree = __degree;
-			_c = __c;
-		}
-		else
-		{
-			// simply multiply by a constant
-			for (int n = 0; n <= _degree; n++)
-				_c[n] *= p._c[0];
-		}
-		return *this;
-	}
-	
-	polynomial& operator+=(double d)
-	{
-		_c[0] += d;
-		return *this;
-	}
-	
-	polynomial& operator-=(double d)
-	{
-		_c[0] -= d;
-		return *this;
-	}
-	
-	polynomial& operator+=(const polynomial& p)
-	{
-		if (p._degree > _degree)
-		{
-			// must resize
-			double* c = new double[p._degree + 1];
-			for (int n = p._degree; n > _degree; n--)
-				c[n] = p._c[n];
-			for (int n = _degree; n >=0; n--)
-				c[n] = _c[n] + p._c[n];
-			_degree = p._degree;
-			delete [] _c;
-			_c = c;
-		}
-		else
-		{
-			for (int n = p._degree; n >=0; n--)
-				_c[n] += p._c[n];
-		}
-		return *this;
-	}
-	
-	polynomial& operator-=(const polynomial& p)
-	{
-		if (p._degree > _degree)
-		{
-			// must resize
-			double* c = new double[p._degree + 1];
-			for (int n = p._degree; n > _degree; n--)
-				c[n] = - p._c[n];
-			for (int n = _degree; n >=0; n--)
-				c[n] = _c[n] - p._c[n];
-			_degree = p._degree;
-			delete [] _c;
-			_c = c;
-		}
-		else
-		{
-			for (int n = p._degree; n >=0; n--)
-				_c[n] -= p._c[n];
-		}
-		return *this;
-	}
-	
-	friend ostream& operator<< (ostream& out, const polynomial& p)
-	{
-		for (int n = p._degree; n > 0; n--)
-			out << p._c[n] << "*x^" << n << " + ";
-		out << p._c[0];
-		return out;
-	}
+    const polynomial& operator=(const polynomial& p)
+    {
+        _degree = p._degree;
+        delete [] _c;
+        _c = new double[_degree + 1];
+
+        for (int i = _degree; i >= 0; i--)
+            _c[i] = p._c[i];
+
+        return p;
+    }
+
+    polynomial& operator=(double d)
+    {
+        _degree = 0;
+        delete [] _c;
+        _c = new double[1];
+        _c[0] = d;
+        return *this;
+    }
+
+    polynomial& operator<<=(int s)
+    {
+        _degree -= s;
+        double* __c = new double[_degree + 1 - s];
+        for (int i = 0; i <= _degree; i++)
+            __c[i] = _c[i + s];
+
+        delete [] _c;
+        _c = __c;
+        return *this;
+    }
+
+    polynomial& operator*=(double d)
+    {
+        for (int n = _degree; n >=0; n--)
+            _c[n] *= d;
+
+        return *this;
+    }
+
+    polynomial& operator*=(const polynomial& p)
+    {
+        if (p._degree > 0)
+        {
+            // must resize for multiplier of degree >1
+            int __degree = p._degree + _degree;
+            double* __c = new double[__degree + 1];
+
+            // initialize coefficients
+            for (int n = 0; n <= __degree; n++)
+                __c[n] = 0;
+
+            // expand sum
+            for (int i = 0; i <= __degree; i++)
+                for (int j = _degree; j < __degree - i; j++)
+                    __c[i] += p._c[i-j] * _c[j];
+
+            // free up old copy and transfer new memory
+            delete [] _c;
+            _degree = __degree;
+            _c = __c;
+        }
+        else
+        {
+            // simply multiply by a constant
+            for (int n = 0; n <= _degree; n++)
+                _c[n] *= p._c[0];
+        }
+        return *this;
+    }
+
+    polynomial& operator+=(double d)
+    {
+        _c[0] += d;
+        return *this;
+    }
+
+    polynomial& operator-=(double d)
+    {
+        _c[0] -= d;
+        return *this;
+    }
+
+    polynomial& operator+=(const polynomial& p)
+    {
+        if (p._degree > _degree)
+        {
+            // must resize
+            double* c = new double[p._degree + 1];
+            for (int n = p._degree; n > _degree; n--)
+                c[n] = p._c[n];
+            for (int n = _degree; n >=0; n--)
+                c[n] = _c[n] + p._c[n];
+            _degree = p._degree;
+            delete [] _c;
+            _c = c;
+        }
+        else
+        {
+            for (int n = p._degree; n >=0; n--)
+                _c[n] += p._c[n];
+        }
+        return *this;
+    }
+
+    polynomial& operator-=(const polynomial& p)
+    {
+        if (p._degree > _degree)
+        {
+            // must resize
+            double* c = new double[p._degree + 1];
+            for (int n = p._degree; n > _degree; n--)
+                c[n] = - p._c[n];
+            for (int n = _degree; n >=0; n--)
+                c[n] = _c[n] - p._c[n];
+            _degree = p._degree;
+            delete [] _c;
+            _c = c;
+        }
+        else
+        {
+            for (int n = p._degree; n >=0; n--)
+                _c[n] -= p._c[n];
+        }
+        return *this;
+    }
+
+    friend ostream& operator<< (ostream& out, const polynomial& p)
+    {
+        for (int n = p._degree; n > 0; n--)
+            out << p._c[n] << "*x^" << n << " + ";
+        out << p._c[0];
+        return out;
+    }
 };
 
 

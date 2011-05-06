@@ -329,16 +329,18 @@ bool Simulation::run(double start_time, double stop_time)
         int err_count = path->check(0.01);
         if (err_count)
         {
-            cerr << "error appending new event to path" << endl;
+            cerr << "error appending new event to path." << endl;
             abort();
         }
-    }
+    } // end main running loop
+
     int err_count = path->check(0.01);
     if (err_count)
     {
-        cerr << "error appending new event to path" << endl;
+        cerr << "There were errors with the path." << endl;
         abort();
     }
+
     return path;
 }
 
@@ -348,7 +350,6 @@ void Simulation::addField(Field *field)
     //octree->setup_vector_fields(&field);
     fields.push_back(field);
 }
-Sociant
 
 //void Simulation::addSurface(Surface * _surface)
 //void Simulation::addSurface(STLSurface * stl_surface)

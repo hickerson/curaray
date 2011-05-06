@@ -6,6 +6,7 @@
 #include "CreationEvent.hh"
 //#include "ContinuityEvent.hh"
 #include "Path.hh"
+#include "Vertex.hh"
 
 using namespace std;
 

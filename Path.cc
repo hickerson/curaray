@@ -1,4 +1,5 @@
 #include "Path.hh"
+#include "Vertex.hh"
 #include <assert.h>
 
 
@@ -53,8 +54,9 @@ void Path::append(Pathlet* pathlet, Vertex* vertex)
 	verticies.push_back(vertex);
 	pathlet->start = stop;
 	pathlet->stop = vertex;
+    stop->set_after(pathlet);
+    vertex->set_before(0);
 	stop = vertex;
-    vertex->set(pathlet,0);
 }
 
 /*
@@ -244,12 +246,13 @@ double Pathlet::get_stop_time()
 	return stop->time;
 }
 
+/* moved to Vertex.cc
 void Vertex::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
 {
 	assert(event);
 	event->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
 }
-
+*/
 
 //const double[3] & Path::getPosition(double time)
 void Path::getPosition(double time, double position[3])

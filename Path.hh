@@ -10,16 +10,9 @@
 #include "assert.h"
 
 #include "polynomial.hh"
-//#include "InteractionEvent.hh"
-//#include "ContinuityEvent.hh"
 #include "Event.hh"
 
 #define MAX_ORDER 4
-
-//class InteractionEvent;
-//class ContinuityEvent;
-//class ParticleEvent;
-//class Event;
 
 using namespace std;
 
@@ -100,8 +93,9 @@ public:
 };
 
 
+#if 0 // moved to Vertex.hh
 /**
- * PathEvent
+ * Vertex
  * 
  * Author: Kevin Peter Hickerson
  */
@@ -246,6 +240,7 @@ public:
 
 	void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time);
 };
+#endif // moved to Vertex.hh
  
 struct Path
 {

@@ -13,7 +13,8 @@
 #include "Source.hh"
 #include "Field.hh"
 #include "Path.hh"
-#include "CellularComplex.hh"
+#include "Vertex.hh"
+//#include "CellularComplex.hh"
 
 using namespace std;
 
