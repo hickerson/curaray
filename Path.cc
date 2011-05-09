@@ -246,14 +246,6 @@ double Pathlet::get_stop_time()
 	return stop->time;
 }
 
-/* moved to Vertex.cc
-void Vertex::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
-{
-	assert(event);
-	event->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
-}
-*/
-
 //const double[3] & Path::getPosition(double time)
 void Path::getPosition(double time, double position[3])
 {
@@ -552,7 +544,28 @@ unsigned Path::discontinuities()
 	return _reflections;
 }
 
-void Path::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
+void Path::writeJSON(ostream &out, double start_write_time, double stop_write_time)
+{
+	// determine starting pathlet
+	assert(stop_write_time > start_write_time);
+	vector<Pathlet*>::iterator p;
+	for (p = pathlets.begin(); p != pathlets.end(); p++)
+	{
+		Pathlet* pathlet = *p;
+		pathlet->writeJSON(out, start_write_time, stop_write_time);
+		if (pathlet->stop)
+		{
+			out << ", " << endl;
+			// TODO stop->writeJSON(out, start_write_time, stop_write_time);
+		}
+        /*
+		if (p != --pathlets.end())
+			out << ", " << endl;
+        */
+	}
+}
+
+void Path::writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time)
 {
 	// determine starting pathlet
 	assert(stop_write_time > start_write_time);
@@ -565,23 +578,29 @@ void Path::writeMathematicaGraphics(ofstream &math_file, double start_write_time
 		//                  / frame_count 
 		//                  + start_time;
 		//segment += 1.0;
-		pathlet->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
+		pathlet->writeMathematicaGraphics(out, start_write_time, stop_write_time);
 		if (pathlet->stop)
 		{
-			math_file << ", " << endl;
-			stop->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
+			out << ", " << endl;
+			stop->writeMathematicaGraphics(out, start_write_time, stop_write_time);
 		}
 		if (p != --pathlets.end())
-			math_file << ", " << endl;
+			out << ", " << endl;
 	}
 }
 
-void Pathlet::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
+void Pathlet::writeJSON(ostream &out, double start_write_time, double stop_write_time)
+{
+    // TODO ...
+    out << "[Pathlet code not done yet]";
+}
+
+void Pathlet::writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time)
 {
 	assert(stop_write_time > start_write_time);
 	assert(scale > 0);
-	math_file << "ParametricPlot3D[{" << curve[0] << ", " << curve[1] << ", " << curve[2] << "}, ";
-	math_file << "{x, " << 0 << ", " << (stop->time - start->time) / scale << "}]";
+	out << "ParametricPlot3D[{" << curve[0] << ", " << curve[1] << ", " << curve[2] << "}, ";
+	out << "{x, " << 0 << ", " << (stop->time - start->time) / scale << "}]";
 	cout << stop->time << " " << start->time << " " << scale << endl;
 	cout << "{x, " << 0 << ", " << (stop->time - start->time) / scale << "}]";
 }

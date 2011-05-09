@@ -89,7 +89,8 @@ public:
 	double get_relative_max_time() {return 1;} // TODO replace with numerical stability calculation
 	double get_start_time();
 	double get_stop_time();
-	void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time);
+	void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time);
+	void writeJSON(ostream &out, double start_write_time, double stop_write_time);
 };
 
 
@@ -288,43 +289,9 @@ public:
 
     //unsigned add(const Pathlet &_segment);
     unsigned discontinuities();
-	void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time);
+	void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time);
+	void writeJSON(ostream &out, double start_write_time, double stop_write_time);
 };
-
-
-
-
-
-
-/*
-struct PathIter
-{
-    PathIter(const Path &path);
-    PathIter(const Path &path,
-                     double start_time, double stop_time);
-    PathIter(const Path &path,
-                     double start_time, 
-                     double stop_time,
-                     double step_time);
-
-    void start();
-    void start(double start_time);
-    void next();
-    bool more();
-
-    void ignore_segments();
-    void stepto_segments();
-
-private:
-    const Path & _path;
-    double _start_time;
-    double _stop_time;
-    double _step_time;
-    double _time;
- 
-    bool _segments;
-};
-*/
 
 
 #endif

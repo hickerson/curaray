@@ -142,9 +142,10 @@ void Vertex::set_after(Pathlet* _after)
  */
 
 
-void Vertex::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
+//void Vertex::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
+void Vertex::writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time)
 {
     assert(event);
-    event->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
+    event->writeMathematicaGraphics(out, start_write_time, stop_write_time);
 }
 

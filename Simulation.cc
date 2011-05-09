@@ -338,6 +338,8 @@ bool Simulation::run(double start_time, double stop_time)
     if (err_count)
     {
         cerr << "There were errors with the path." << endl;
+        path->writeMathematicaGraphics(cout, start_time, stop_time);
+        //path->writeJSON(cout, start_time, stop_time);
         abort();
     }
 

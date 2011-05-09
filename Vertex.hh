@@ -55,6 +55,7 @@ public:
 	void set_after(Pathlet* _after);
 	//void set_all(Event* _event, Pathlet* _before, Pathlet* _after);
 
-	void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time);
+	//void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time);
+	void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time);
 };
 #endif

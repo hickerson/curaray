@@ -39,7 +39,7 @@ void ParticleEvent::redirect_vertex(Vertex* vertex)
     // ...
 }
 
-void ParticleEvent::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
+void ParticleEvent::writeMathematicaGraphics(ostream &math_file, double start_write_time, double stop_write_time)
 {
     //if (get_time() >= start_write_time and get_time() < stop_write_time)
     {
