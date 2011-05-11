@@ -102,7 +102,7 @@ Plane<n,k>::interact(Pathlet* pathlet, double start_time, double stop_time) cons
     polynomial p = 0;
     for (int i = 0; i < 3; i++)
     {
-        polynomial q = pathlet->curve[i];
+        polynomial q = pathlet->get_curve(i);
         q *= normal[i];
         p += q;
     }
@@ -160,7 +160,7 @@ Plane<n,k>::selfinteract(Pathlet* pathlet, double start_time, double stop_time) 
     polynomial p = 0;
     for (int i = 0; i < 3; i++)
     {
-        polynomial q = pathlet->curve[i];
+        polynomial q = pathlet->get_curve(i);
         q *= normal[i];
         p += q;
     }

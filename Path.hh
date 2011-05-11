@@ -60,6 +60,7 @@ class Pathlet
 	void set_stop_vertex(Vertex*);
 	Vertex* get_start_vertex();
 	Vertex* get_stop_vertex();
+    const polynomial& get_curve(int i) const;
 	void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time);
 	void writeJSON(ostream &out, double start_write_time, double stop_write_time);
 };

@@ -188,7 +188,8 @@ Pathlet::Pathlet(polynomial p[3], Vertex* _start)
 */
 
 Pathlet::Pathlet(polynomial p[3], Vertex* _start, Vertex* _stop)
-: scale(1), start(_start), stop(_stop)
+  : start(_start), stop(_stop), 
+    scale(1) // default for now
 {
 	for (int i = 0; i < 3; i++)
 		curve[i] = p[i];
@@ -270,6 +271,11 @@ double Pathlet::get_stop_time()
 {
 	assert(stop);
 	return stop->get_time();
+}
+
+const polynomial & Pathlet::get_curve(int i) const
+{
+    return curve[i];
 }
 
 //const double[3] & Path::get_position(double time)
@@ -576,7 +582,7 @@ void Path::writeJSON(ostream &out, double start_write_time, double stop_write_ti
 	// determine starting pathlet
 	assert(stop_write_time > start_write_time);
     out << "{" << endl 
-        << "\"pathlets\" : [" << endl;
+        << right << "\"pathlets\" : [" << endl << right;
 	vector<Pathlet*>::iterator p;
 	for (p = pathlets.begin(); p != pathlets.end(); p++)
 	{
@@ -585,7 +591,7 @@ void Path::writeJSON(ostream &out, double start_write_time, double stop_write_ti
 		if (p != --pathlets.end())
 			out << ", " << endl;
 	}
-    out << "]" << endl;
+    out << left << "]" << endl;
     out << "\"verticies\" : [" << endl;
 	vector<Vertex*>::iterator v;
 	for (v = verticies.begin(); v != verticies.end(); v++)
@@ -595,7 +601,7 @@ void Path::writeJSON(ostream &out, double start_write_time, double stop_write_ti
 		if (v != --verticies.end())
 			out << ", " << endl;
 	}
-    out << "]" << endl << "}";
+    out << "]" << endl << left  << "}";
 }
 
 void Path::writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time)

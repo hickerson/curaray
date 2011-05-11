@@ -292,7 +292,11 @@ bool Simulation::run(double start_time, double stop_time)
     {
         runs++;
         cout << "runs " << runs << endl;
-        assert (runs < 100);
+        if (runs >= 100)
+        {    
+            path->writeJSON(cerr, start_time, stop_time);
+            assert(false);
+        }
         Pathlet* pathlet = 0;
         Geometry* best_geometry = 0;
         ParticleEvent* best_event = 0;

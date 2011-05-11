@@ -29,32 +29,28 @@ class InteractionEvent
 	//const Surface*  surface;
 	
 public:
-	//InteractionEvent(double t, const Geometry* g, const double n[3], const x[3])
-	InteractionEvent(double t, const Geometry* g, const double n[3],
+	InteractionEvent(double t, const Geometry* _geometry, const double _normal[3],
 					 Pathlet* path_in, Pathlet* path_out) 
-		//: ContinuityEvent(t,x)
-		//: ParticleEvent(t, path_in, path_out)
-		: ContinuityEvent(t, path_in, path_out)
-		//: geometry(g), before(path_in), after(path_out), order(0)
+		: ContinuityEvent(t, path_in, path_out), geometry(_geometry)
 	{
-		//time = t;
-		geometry = g;
-		//before = path_in;
-		//after = path_out;
-		order = 0;
+        for (int i =0; i < 3; i++)
+            normal[i] = _normal[i];
+
 		//before->getPosition(t, position);
 		//before->getVelocity(t, in);
+        /*
 		if (before)
 		{
-    		double ni = dot(n,in);
+    		double n_i = dot(n,in);
     		for (unsigned k = 0; k < 3; k++)
 			{
-    			out[k] = in[k] - 2*ni*n[k];
+    			out[k] = in[k] - 2*n_i*n[k];
 				normal[k] = n[k];
 			}
 		}
 		else
 			abort();
+        */
 	}
 
 	~InteractionEvent() {};
