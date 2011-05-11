@@ -17,7 +17,7 @@ class Pathlet;
 class Vertex 
 {
 public:
-	double time;
+	//double time;
 	double position[3];
 	double in[3];
 	double out[3];
@@ -38,10 +38,11 @@ private:
 	Event* event;
 	
 public:
-	Vertex(double _time, const double x[3], const double v[3]);
+	//Vertex(double _time, const double x[3], const double v[3]);
 	Vertex(Event* _event, const double x[3], const double v[3]);
 	Vertex(Event* _event , Pathlet* _before, Pathlet* _after);
 
+    double get_time();
 	double get_position(int i);
 	void set_position(double x[3]);
 	double get_in(int i);
@@ -55,7 +56,7 @@ public:
 	void set_after(Pathlet* _after);
 	//void set_all(Event* _event, Pathlet* _before, Pathlet* _after);
 
-	//void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time);
+	void writeJSON(ostream &math_file, double start_write_time, double stop_write_time);
 	void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time);
 };
 #endif

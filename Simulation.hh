@@ -4,12 +4,9 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-//#include "Octree.hh"
 //#include "ParticleEvent.hh"
 //#include "CreationEvent.hh"
 #include "InteractionEvent.hh"
-//#include "Volume.hh"
-//#include "Solid.hh"
 #include "Source.hh"
 #include "Field.hh"
 #include "Path.hh"
@@ -29,6 +26,7 @@ using namespace std;
  */
 class Simulation
 {
+  private:
 	double 				earliest_time; 	/// the earliest time boundary of the simulation
 	double 				latest_time;  	/// the latest time boundary of the simulation
     const Geometry*  	volume;         /// the geometry on which the simulation is valid
@@ -38,7 +36,7 @@ class Simulation
 	vector<Source*> 	sources;    	/// sources of point-like particles
 	vector<Path*>   	paths;			/// the paths of simulated particles
 	
-public:
+  public:
 	//Simulation();
 	Simulation(const Geometry *_volume);
 	Simulation(const Geometry *_volume, double _start_time, double _stop_time);
@@ -56,20 +54,20 @@ public:
 	//void addSurface(STLSurface * stl_surface); // TODO UCNSimulation only
 	//void add(STLSurface * stl_surface); 
 
-public:
 	// void run(const Particle & particle, double start_time, double stop_time);
 	//Path* run(double start_time, double stop_time);
 	bool run(double start_time, double stop_time);
 	//void run(double start_time, double stop_time, int particle_count, Path**);
 	int run(double start_time, double stop_time, int particle_count);
 	
-public: // i/o
 	void writeMathematicaGraphics(ofstream & of);
 	void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop);
 
-private:
+  private:
 	//Pathlet* solve_pathlet(ContinuityEvent *event); // generate the next pathlet from the event
 	Pathlet* solve_pathlet(Vertex *vertex); // generate the next pathlet from the event
+    int get_field_degree(int axis);
+    double get_field_acceleration(Vertex* vertex, int axis);
 };
 
 #endif

@@ -23,7 +23,7 @@ public:
 	
 	//double get_time();
 
-	//virtual void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time) = 0;
+	virtual void writeJSON(ostream &out, double start_write_time, double stop_write_time) = 0;
 	virtual void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time) = 0;
 };
 

@@ -71,6 +71,11 @@ public:
 		return _c[n % (_degree+1)];
 	}
 	
+    double get_stable_max() const
+    {
+        return 1;   // TODO make a numerical stability calculation
+    }
+
 	double evaluate(double t) const
 	{
 		double value = _c[_degree];

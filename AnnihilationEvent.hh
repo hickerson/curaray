@@ -17,11 +17,17 @@ class Pathlet;
  */
 class AnnihilationEvent : public ParticleEvent
 {
-	Pathlet* before;
-	double in[3];
+	//Pathlet* before;
+	//double in[3];
 	
 public:
 	//AnnihilationEvent();
+	AnnihilationEvent(double t, double x[3], double v[3])
+	: ParticleEvent(t,x,v)
+	{
+		//set_position(x);
+		//set_velocity(v);
+	}
 	
 
 	//~AnnihilationEvent();

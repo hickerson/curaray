@@ -57,7 +57,8 @@ public:
 	void set_position(double x[3]);
 
     virtual void redirect_vertex(Vertex* vertex);
-	virtual void writeMathematicaGraphics(ostream &math_file, double start_write_time, double stop_write_time);
+	virtual void writeJSON(ostream &out, double start_write_time, double stop_write_time);
+	virtual void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time);
 };
 
 #endif

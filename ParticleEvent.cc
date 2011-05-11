@@ -22,8 +22,8 @@ ParticleEvent::ParticleEvent(double t, Pathlet* path_in, Pathlet* path_out)
     order = 2;
     if (before)
     {
-        before->getPosition(t, position);
-        before->getVelocity(t, in);
+        before->get_position(t, position);
+        before->get_velocity(t, in);
     }
     if (order > 0)
         for (unsigned k = 0; k < 3; k++)
@@ -34,17 +34,30 @@ void ParticleEvent::redirect_vertex(Vertex* vertex)
 {
     double x[3]; // TODO
     double p[3];
+    assert(vertex);
     vertex->get_in(p);
     vertex->set_out(p);
     // ...
 }
 
-void ParticleEvent::writeMathematicaGraphics(ostream &math_file, double start_write_time, double stop_write_time)
+void ParticleEvent::writeJSON(ostream &out, double start_write_time, double stop_write_time)
 {
     //if (get_time() >= start_write_time and get_time() < stop_write_time)
     {
-        math_file << "Graphics3D[{Blue, Sphere [{"
-            << get_position(0)<<","<<get_position(1)<<","<<get_position(2)<<"}, 0.1]}]";
+        //out << "ParticleEvent : {" << endl
+        out << "{" << endl
+            << "\"position\" : ["<<get_position(0)<<", "<<get_position(1)<<", "<<get_position(2)<<"]"<< endl
+            << "}" << endl;
+    }
+}
+
+void ParticleEvent::writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time)
+{
+    //if (get_time() >= start_write_time and get_time() < stop_write_time)
+    {
+        out << "Graphics3D[{Blue, Sphere [{"
+            << get_position(0) << ", " << get_position(1) << ", " << get_position(2) << "}, "
+            << "0.1]}]"; // TODO radius
     }
 }
 

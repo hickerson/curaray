@@ -17,8 +17,8 @@ class Pathlet;
  */
 class CreationEvent : public ParticleEvent
 {
-	Pathlet* after;
-	double out[3];
+	//Pathlet* after;
+	//double out[3];
 	
 public:
 	CreationEvent(double t, double x[3], double v[3])

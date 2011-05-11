@@ -1,9 +1,10 @@
 #include "Path.hh"
 #include "Vertex.hh"
 
+/*
 Vertex::Vertex(double _time, const double x[3], const double v[3])
 {
-    time = _time;
+    //time = _time;
     event = 0;
     before = 0;
     after = 0;
@@ -15,11 +16,12 @@ Vertex::Vertex(double _time, const double x[3], const double v[3])
         out[k] = v[k];
     }
 }
+*/
 
 Vertex::Vertex(Event* _event, const double x[3], const double v[3])
 {
     event = _event;
-    time = event->time;
+    //time = event->time;
     before = 0;
     after = 0;
     order = 1;
@@ -34,18 +36,24 @@ Vertex::Vertex(Event* _event, const double x[3], const double v[3])
 Vertex::Vertex(Event* _event , Pathlet* _before, Pathlet* _after) 
 {
     event = _event;
-    time = event->time;
     before = _before;
     after = _after;
     order = 2;
     if (before)
     {
-        before->getPosition(time, position);
-        before->getVelocity(time, in);
+        double time = event->time;
+        before->get_position(time, position);
+        before->get_velocity(time, in);
     }
     if (order > 0)
         for (unsigned k = 0; k < 3; k++)
             out[k] = in[k];
+}
+
+double Vertex::get_time()
+{
+    assert(event);
+    return event->time;
 }
 
 double Vertex::get_position(int i)
@@ -98,16 +106,17 @@ void Vertex::set_event(Event* _event)
 {
     assert(_event);
     event = _event;
-    time = event->time;
+    //time = event->time;
 }
 
 void Vertex::set_before(Pathlet* _before) 
 {
+    assert(event);
     before = _before;
     if (before)
     {
-        before->getPosition(time, position);
-        before->getVelocity(time, in);
+        before->get_position(event->time, position);
+        before->get_velocity(event->time, in);
     }
 }
 
@@ -116,8 +125,8 @@ void Vertex::set_after(Pathlet* _after)
     after = _after;
     if (after)
     {
-        after->getPosition(time, position);
-        after->getVelocity(time, in);
+        after->get_position(event->time, position);
+        after->get_velocity(event->time, in);
     }
 }
 
@@ -142,7 +151,13 @@ void Vertex::set_after(Pathlet* _after)
  */
 
 
-//void Vertex::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
+void Vertex::writeJSON(ostream &out, double start_write_time, double stop_write_time)
+{
+    assert(event);
+    out << "\"event\" : ";
+    event->writeJSON(out, start_write_time, stop_write_time);
+}
+
 void Vertex::writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time)
 {
     assert(event);

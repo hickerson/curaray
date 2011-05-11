@@ -1,7 +1,7 @@
 #include "Simulation.hh"
 #include "MonteCarlo.hh"
 //#include "CreationEvent.hh"
-//#include "AnnihilationEvent.hh"
+#include "AnnihilationEvent.hh"
 //#include "ContinuityEvent.hh"
 
 #include <iomanip>
@@ -45,47 +45,63 @@ Simulation::~Simulation() {}
 // ...
 //}
 
+int Simulation::get_field_degree(int axis)
+// TODO int Simulation::get_field_degree(Vertex* vertex, int axis)
+{
+    int degree = 1;  // basic momentum
+
+    vector<Field*>::iterator f;
+    for (f = fields.begin(); f != fields.end(); f++)
+    {
+        Field* field = *f;
+        int _degree = field->get_degree(axis); // TODO support time varying fields
+        // TODO int _degree = field->get_degree(vertex, axis);
+        if (degree < _degree)
+            degree = _degree;	
+    }
+
+    return degree;
+}
+
+double Simulation::get_field_acceleration(Vertex* vertex, int axis)
+{
+    double c = 0;
+
+    vector<Field*>::iterator f;
+    for (f = fields.begin(); f != fields.end(); f++)
+    {
+        Field* field = *f; 
+        c += 0.5 * field->get_acceleration(vertex, axis); 
+    }
+
+    return c;
+}
 
 // generate the next pathlet from the event using fields
-Pathlet* Simulation::solve_pathlet(Vertex *vertex)
+Pathlet* Simulation::solve_pathlet(Vertex *start)
 {
     // TODO seperate polynomial solutions from Runge-Kutta
     polynomial p[3]; // TODO make dimensionality a parameter
+    double stable_time = 0;
 
     for (int axis = 0; axis < 3; axis++) // TODO make dimensionality a parameter
     {
-        int degree = 1;
-        vector<Field*>::iterator f;
-        for (f = fields.begin(); f != fields.end(); f++)
-        {
-            Field* field = *f;
-            int d = field->get_degree(axis); // TODO support time varying fields
-            if (d > degree)
-                degree = d;	
-        }
+        int degree = get_field_degree(axis);
 
         if (degree == 2)
         {
             double c[3] = {
-                vertex->get_position(axis), // TODO move outside
-                vertex->get_out(axis), // TODO move outside
-                0
+                start->get_position(axis), // TODO move outside
+                start->get_out(axis), // TODO move outside
+                get_field_acceleration(start, axis)
             };
-            vector<Field*>::iterator f;
-            for (f = fields.begin(); f != fields.end(); f++)
-            {
-                Field* field = *f; // TODO support time varying fields
-                //c[2] += 0.5 * field->get_acceleration(event, axis); 
-                c[2] += 0.5 * field->get_acceleration(vertex, axis); 
-            }
-
             p[axis] = polynomial(2,c);
         }
         else if (degree == 1) // TODO check non-negative 
         {
             double c[2] = {
-                vertex->get_position(axis), // TODO move outside
-                vertex->get_out(axis)  // TODO move outside
+                start->get_position(axis), // TODO move outside
+                start->get_out(axis)  // TODO move outside
             };
             if (c[1] == 0) exit(0); // not sure what the point of this is ...
             p[axis] = polynomial(1,c);
@@ -97,9 +113,22 @@ Pathlet* Simulation::solve_pathlet(Vertex *vertex)
         }
         // TODO look for any other solution type
         //cout << "advance[" << degree << "]: " << p[axis] << endl;
+
+        double t = p[axis].get_stable_max();
+        if (stable_time > 0 and stable_time < t)
+            stable_time = t;
     }
 
-    return new Pathlet(p, vertex);
+    double time = start->get_time() + stable_time;
+    Pathlet* pathlet = new Pathlet(p, start, 0);
+    double x[3], v[3];
+    pathlet->get_position(time, x);
+    pathlet->get_velocity(time, v);
+    AnnihilationEvent* event = new AnnihilationEvent(time, x, v);
+    Vertex* stop = new Vertex(event, x ,v);
+    pathlet->set_stop_vertex(stop);
+
+    return pathlet;
 }
 
 /*
@@ -205,18 +234,15 @@ bool Simulation::run(double start_time, double stop_time)
         abort(); // TODO throw error ?
     }
 
-    //CreationEvent* start_event = source->create(start_time, stop_time);
-    //ParticleEvent* event = source->create(start_time, stop_time);
     Vertex* vertex = source->create_vertex(start_time, stop_time);
-    //if (not event)
     if (not vertex)
     {
-        cerr << "no creation event" << endl;
+        cerr << "No vertex created by source." << endl;
         abort(); // TODO throw error ?
     }
 
     path = new Path(vertex); // TODO add args
-    cout << "setting path start time to " << vertex->time << " sec" << endl;
+    cout << "setting path start time to " << vertex->get_time() << " sec" << endl;
     paths.push_back(path);
 
     // TODO Geometry* last_geormetry = source->getGeometry();
@@ -241,12 +267,11 @@ bool Simulation::run(double start_time, double stop_time)
             cerr << "No pathlet. Can't identify next event." << endl;
             abort();
         }
-        double min_time = vertex->time;
-        cout << "vertex->time = " << vertex->time << endl;
-        vertex = pathlet->stop;     // iterates to next pathlet
-        double max_time = vertex->time;
+        double min_time = vertex->get_time();
+        cout << "vertex->get_time() = " << vertex->get_time() << endl;
+        vertex = pathlet->get_stop_vertex();     // iterates to next pathlet
+        double max_time = vertex->get_time();
 
-        cout << "pathlet->get_relative_max_time() = " << pathlet->get_relative_max_time() << endl;
         cout << "max_time = " << max_time << endl;
         cout << "stop_time = " << stop_time << endl;
 
@@ -303,7 +328,7 @@ bool Simulation::run(double start_time, double stop_time)
             cout << "Path out of bounds." << endl;
             best_event = out_of_bounds;
             out_of_bounds->out_of_bounds = true; // TODO add to constructor
-            max_time = vertex->time;
+            max_time = vertex->get_time();
             running = false;
         }
         else
@@ -330,6 +355,7 @@ bool Simulation::run(double start_time, double stop_time)
         if (err_count)
         {
             cerr << "Error appending new event to path." << endl;
+            path->writeJSON(cout, start_time, stop_time);
             abort();
         }
     } // end main running loop
@@ -338,7 +364,7 @@ bool Simulation::run(double start_time, double stop_time)
     if (err_count)
     {
         cerr << "There were errors with the path." << endl;
-        path->writeMathematicaGraphics(cout, start_time, stop_time);
+        //path->writeMathematicaGraphics(cout, start_time, stop_time);
         //path->writeJSON(cout, start_time, stop_time);
         abort();
     }

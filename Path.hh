@@ -23,255 +23,70 @@ class Vertex;
  *
  * Author: Kevin Peter Hickerson
  */
-struct Pathlet
+class Pathlet
 {
-private:
-	// may not need this if we always define as unity
-	// for now scale is the endpoint 
-	double scale; 
-    
-public:
-	polynomial curve[3];
+  public: 
+    friend class Path;
 
-	// TODO make private
-    //double start_time;
-    //double stop_time;
-
-public:
-    //Event* start_event;
-    //Event* stop_event;
+  private:
     Vertex* start;
     Vertex* stop;
+	polynomial curve[3];
 
+	const double scale; // for now always 1
     //unsigned dim; // for now dim = 3
-    //bool reflection;
-    //bool start_reflection;
-    //bool stop_reflection;
     //unsigned order; 
-    //double coefficient[MAX_ORDER][3]; // at most 4th order
 
-public:
+  public:
     Pathlet();
     Pathlet(const Pathlet &);
-	//Pathlet(Event* start, polynomial p[3]);
-	//Pathlet(Event* start, Event* stop, polynomial p[3]); 
-	//Pathlet(polynomial p[3]); 
-	Pathlet(polynomial p[3], Vertex* _start); 
+	//Pathlet(polynomial p[3], Vertex* _start); 
 	Pathlet(polynomial p[3], Vertex* _start, Vertex* _stop); 
 	
-/*
-    Pathlet(double _start_time,
-			double _stop_time,
-			const polynomial p[3]);
-	Pathlet(//const Particle & particle, 
-            const double time,
-		    const double a[3]);
-    Pathlet(//const Particle & particle,  
-            const double time,
-		    const double a[3], 
-            const double b[3]);
-    Pathlet(//const Particle & particle, 
-            const double time,
-			const double a[3], 
-			const double b[3],
-			const double c[3]);
-	*/
-
-public:
-    void getPosition(double time, double position[3]) const ;
-    void getVelocity(double time, double velocity[3]) const ;
+  public:
+    void get_moment(double time, double position[3]) const ;
+    void get_position(double time, double position[3]) const ;
+    void get_velocity(double time, double velocity[3]) const ;
     void getStartPosition(double position[3]) const ;
     void getStopPosition(double position[3]) const ;
     double getMaximum(double start, double stop, const double direction[3]) const ;
     void reflect(double normal[3]);
     void noreflect();
 	void set(int axis, const polynomial &p);
-	double get_relative_max_time() {return 1;} // TODO replace with numerical stability calculation
+	//double get_relative_max_time() {return 1;} // TODO replace with numerical stability calculation
 	double get_start_time();
 	double get_stop_time();
+	void set_start_vertex(Vertex*);
+	void set_stop_vertex(Vertex*);
+	Vertex* get_start_vertex();
+	Vertex* get_stop_vertex();
 	void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time);
 	void writeJSON(ostream &out, double start_write_time, double stop_write_time);
 };
 
 
-#if 0 // moved to Vertex.hh
-/**
- * Vertex
- * 
- * Author: Kevin Peter Hickerson
- */
-class Vertex 
+class Path
 {
-public:
-	double time;
-	double position[3];
-	double in[3];
-	double out[3];
-	Pathlet* before;
-	Pathlet* after;
-	unsigned order;
-
-    enum vertexType {
-        continuous,
-        begining,
-        end,
-        branch,
-        reflection,
-        interacting
-    };
-
-private:
-	Event* event;
-	
-public:
-	Vertex(double _time, const double x[3], const double v[3])
-	{
-		time = _time;
-		event = 0;
-		before = 0;
-		after = 0;
-		order = 1;
-    	for (unsigned k = 0; k < 3; k++)
-		{
-    		position[k] = x[k];
-			in[k] = v[k];
-			out[k] = v[k];
-		}
-	}
-
-	Vertex(Event* _event, const double x[3], const double v[3])
-	{
-		event = _event;
-		time = event->time;
-		before = 0;
-		after = 0;
-		order = 1;
-    	for (unsigned k = 0; k < 3; k++)
-		{
-    		position[k] = x[k];
-			in[k] = v[k];
-			out[k] = v[k];
-		}
-	}
-
-	Vertex(Event* _event , Pathlet* _before, Pathlet* _after) 
-	{
-		event = _event;
-		time = event->time;
-		before = _before;
-		after = _after;
-		order = 2;
-		if (before)
-		{
-			before->getPosition(time, position);
-			before->getVelocity(time, in);
-		}
-		if (order > 0)
-    		for (unsigned k = 0; k < 3; k++)
-    			out[k] = in[k];
-	}
-
-	double get_position(int i)
-	{
-		return position[i];
-	}
-	
-	void set_position(double x[3])
-	{
-		for (int i=0; i<3; i++)
-			position[i] = x[i];
-	}
-
-	double get_in(int i)
-	{
-		return in[i];
-	}
-
-	double get_out(int i)
-	{
-		return out[i];
-	}
-
-	void set_event(Event* _event)
-    {
-		assert(_event);
-		event = _event;
-		time = event->time;
-    }
-
-	void set_before(Pathlet* _before) 
-	{
-		before = _before;
-		if (before)
-		{
-			before->getPosition(time, position);
-			before->getVelocity(time, in);
-		}
-	}
-
-	void set_after(Pathlet* _before) 
-	{
-		after = _after;
-		if (after)
-		{
-			after->getPosition(time, position);
-			before->getVelocity(time, in);
-		}
-	}
-
-/*
-	void set_all(Event* _event, Pathlet* _before, Pathlet* _after) 
-	{
-		assert(_event);
-		event = _event;
-		time = event->time;
-		before = _before;
-		after = _after;
-		order = 2;
-		if (before)
-		{
-			before->getPosition(time, position);
-			before->getVelocity(time, in);
-		}
-		if (order > 0)
-    		for (unsigned k = 0; k < 3; k++)
-    			out[k] = in[k];
-	}
-*/
-
-	void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time);
-};
-#endif // moved to Vertex.hh
- 
-struct Path
-{
+  private:
     //unsigned count; 
     vector<Pathlet*> 	pathlets;
 	vector<Vertex*>  	verticies;
-	//vector<Event*>  	events;
-    //double 			start_time;
-    //double 			stop_time;
-	//Event* 			start_event;
-	//Event* 			stop_event;
 	Vertex* 			start;
 	Vertex* 			stop;
 
-private:
-    bool 		_visable;
-    unsigned 	_reflections;
+    bool 		        _visable;
+    unsigned 	        _reflections;
 
-public:
+  public:
     //Path();
     ~Path();
     Path(const Path &);
-	//Path(Event* event); 
 	Path(Vertex* vertex); 
-    Path(unsigned _count, double _t_start, double _t_stop);
 
-    void getPosition(double time, double position[3]);
-    void getVelocity(double time, double velocity[3]);
-    double getPosition(double start, double stop, double position[3]);
-    double getMaximum(double start, double stop, const double direction[3]);
+    void get_position(double time, double position[3]);
+    void get_velocity(double time, double velocity[3]);
+    double get_position(double start, double stop, double position[3]);
+    double get_maximum(double start, double stop, const double direction[3]);
 
 	//void append(Event *event);
 	//void append(Pathlet *pathlet);
@@ -291,6 +106,7 @@ public:
     unsigned discontinuities();
 	void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time);
 	void writeJSON(ostream &out, double start_write_time, double stop_write_time);
+
 };
 
 

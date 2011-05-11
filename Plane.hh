@@ -98,6 +98,7 @@ template <dimension n, codimension k>
 InteractionEvent* 
 Plane<n,k>::interact(Pathlet* pathlet, double start_time, double stop_time) const
 {
+    cout << "Looking for interaction in Plane<" << n << "," << k << ">." << endl;
     polynomial p = 0;
     for (int i = 0; i < 3; i++)
     {
@@ -146,8 +147,7 @@ template <dimension n, codimension k>
 InteractionEvent* 
 Plane<n,k>::selfinteract(Pathlet* pathlet, double start_time, double stop_time)  const
 {
-
-    cout << "looking for self-interaction" << endl;
+    cout << "Looking for selfinteraction in Plane<" << n << "," << k << ">." << endl;
     // TODO optimize
     /* TODO 
        1. check degree
@@ -178,7 +178,7 @@ Plane<n,k>::selfinteract(Pathlet* pathlet, double start_time, double stop_time) 
 
         if (t > start_time)
             return new InteractionEvent(t, this, normal, pathlet, 0);
-        //return new InteractionEvent(t, this, normal);
+            //return new InteractionEvent(t, this, normal);
     }
 
     return 0;
