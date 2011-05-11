@@ -201,13 +201,49 @@ int Simulation::run(double start_time, double stop_time, int count)
     return final_count;
 }
 
+Vertex* Simulation::get_vertex(double start_time, double stop_time)
+{
+    double sources_strength = 0;  // expected number of creation 
+    vector<Source*>::iterator s;
+    for (s = sources.begin(); s != sources.end(); s++)
+    {
+        // calculate source strengths for all times ...
+        sources_strength += (*s)->get_strength(start_time, stop_time);
+    }
+
+    Source* source = 0;	
+    double random_strength = randomInterval();
+    for (s = sources.begin(); s != sources.end(); s++)
+    {
+        // TODO calculate source strengths for different times ...
+        // TODO and pick a sources correctly.
+        source = *s; // TODO fix this hack (only work with one source)
+    }
+
+    if (not source) 
+    {
+        cerr << "no sources found" << endl;
+        abort(); // TODO throw error ?
+    }
+
+    Vertex* vertex = source->create_vertex(start_time, stop_time);
+    if (not vertex)
+    {
+        cerr << "No vertex created by source." << endl;
+        abort(); // TODO throw error ?
+    }
+    
+    return vertex;
+}
+
 // compute one path	
 //Path* Simulation::run(double start_time, double stop_time)
 bool Simulation::run(double start_time, double stop_time)
 {
     cout << "passed to run: start_time = " << start_time << " stop_time = " << stop_time << endl;
 
-    Path* path = 0;
+
+    /*
     Source* source = 0;	
 
     double sources_strength = 0;  // expected number of creation 
@@ -240,13 +276,14 @@ bool Simulation::run(double start_time, double stop_time)
         cerr << "No vertex created by source." << endl;
         abort(); // TODO throw error ?
     }
-
-    path = new Path(vertex); // TODO add args
+    */
+    Vertex* vertex = get_vertex(start_time, stop_time);
+    Path* path = new Path(vertex); // TODO add args
     cout << "setting path start time to " << vertex->get_time() << " sec" << endl;
     paths.push_back(path);
 
-    // TODO Geometry* last_geormetry = source->getGeometry();
-    Geometry* last_geometry = source->geometry;
+    //Geometry* last_geometry = source->geometry;
+    Geometry* last_geometry = 0;
 
     // TODO while (start_time < t < stop_time)	
     int runs = 0;

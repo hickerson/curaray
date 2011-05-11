@@ -68,6 +68,7 @@ class Simulation
 	Pathlet* solve_pathlet(Vertex *vertex); // generate the next pathlet from the event
     int get_field_degree(int axis);
     double get_field_acceleration(Vertex* vertex, int axis);
+    Vertex* get_vertex(double start_time, double stop_time);
 };
 
 #endif
