@@ -97,15 +97,17 @@ public:
 		return p;
 	}
 
-	void writeMathematicaGraphics(ofstream & of) 
+	void writeMathematicaGraphics(ostream &out) 
 	{
 		// TODO
+        out << "not supported";
 		abort();
 	}
 
-	void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop)
+	void writeMathematicaGraphics(ostream &out, double start_time, double stop_stop)
 	{
 		// TODO
+        out << "not supported";
 		abort();
 	}
 

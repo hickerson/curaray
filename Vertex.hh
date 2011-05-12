@@ -52,6 +52,7 @@ public:
 	void set_in(const double p[3]);
 	void set_out(const double p[3]);
 	void set_event(Event* _event);
+	Event* get_event();
 	void set_before(Pathlet* _before);
 	void set_after(Pathlet* _after);
 	//void set_all(Event* _event, Pathlet* _before, Pathlet* _after);

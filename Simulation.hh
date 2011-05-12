@@ -40,7 +40,6 @@ class Simulation
 	//Simulation();
 	Simulation(const Geometry *_volume);
 	Simulation(const Geometry *_volume, double _start_time, double _stop_time);
-	~Simulation();
 	
 	void addField(Field *field);
 	void addGeometry(Geometry *geometry);
@@ -60,15 +59,15 @@ class Simulation
 	//void run(double start_time, double stop_time, int particle_count, Path**);
 	int run(double start_time, double stop_time, int particle_count);
 	
-	void writeMathematicaGraphics(ofstream & of);
-	void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop);
+	void writeMathematicaGraphics(ostream &out);
+	void writeMathematicaGraphics(ostream &out, double start_time, double stop_stop);
 
   private:
 	//Pathlet* solve_pathlet(ContinuityEvent *event); // generate the next pathlet from the event
 	Pathlet* solve_pathlet(Vertex *vertex); // generate the next pathlet from the event
     int get_field_degree(int axis);
     double get_field_acceleration(Vertex* vertex, int axis);
-    Vertex* get_vertex(double start_time, double stop_time);
+    Vertex* get_first_vertex(double start_time, double stop_time);
 };
 
 #endif

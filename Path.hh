@@ -53,7 +53,8 @@ class Pathlet
     void reflect(double normal[3]);
     void noreflect();
 	void set(int axis, const polynomial &p);
-	//double get_relative_max_time() {return 1;} // TODO replace with numerical stability calculation
+	double get_stable_time(int axis); // TODO replace with numerical stability calculation
+	double get_stable_time();
 	double get_start_time();
 	double get_stop_time();
 	void set_start_vertex(Vertex*);

@@ -109,8 +109,8 @@ public:
 */
 	//double* get_random_point(double time) const;
 	double* get_random_point() const;
-	void writeMathematicaGraphics(ofstream & of);
-	void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop);
+	void writeMathematicaGraphics(ostream &out);
+	void writeMathematicaGraphics(ostream &out, double start_time, double stop_stop);
 
 	virtual InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const
 	{
@@ -162,20 +162,19 @@ double* Sphere<k,n>::get_random_point() const
 }
 
 template <dimension k, codimension n>
-void Sphere<k,n>::writeMathematicaGraphics(ofstream & math_file) 
+void Sphere<k,n>::writeMathematicaGraphics(ostream &out) 
 {
 	cout << "Printing sphere.";
-	math_file 
-		<< "Graphics3D[ {Red, Opacity[1], Specularity[White, 30], Sphere [{" 
+	out << "Graphics3D[ {Red, Opacity[1], Specularity[White, 30], Sphere [{" 
 	    //<< center[0] << ", " << center[1] << ", " << center[2] 
 	    << "0,0,0"
         << "}, " << radius << "]}, Background -> Black]";
 }
 
 template <dimension k, codimension n>
-void Sphere<k,n>::writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop)
+void Sphere<k,n>::writeMathematicaGraphics(ostream &out, double start_time, double stop_stop)
 {
-	writeMathematicaGraphics(math_file);
+	writeMathematicaGraphics(out);
 }
 
 #endif

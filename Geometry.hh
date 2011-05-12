@@ -25,8 +25,8 @@ public:
 	virtual InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const = 0;
 	virtual InteractionEvent* selfinteract(Pathlet* pathlet, double start_time, double stop_time) const = 0;
 	
-	virtual void writeMathematicaGraphics(ofstream & of) = 0;
-	virtual void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop) = 0;
+	virtual void writeMathematicaGraphics(ostream &out) = 0;
+	virtual void writeMathematicaGraphics(ostream &out, double start_time, double stop_stop) = 0;
 
 	//virtual double* get_random_point(double time) const = 0;
 	virtual double* get_random_point() const = 0;

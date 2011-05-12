@@ -5,27 +5,11 @@
 //#include "ContinuityEvent.hh"
 
 #include <iomanip>
-//Simulation::Simulation()
-//{
-//}
-
-
-//Simulation::Simulation(const Volume &_volume)
-//	: volume(_volume)
-//{
-    //unsigned max_depth = 1;
-    //unsigned fields_count = 1;
-//}
-
-
 Simulation::Simulation(const Geometry *_volume) 
 : 	earliest_time(0), 
 	latest_time(0),
 	volume(_volume) 
 {
-	//addGeometry(volume);
-    //unsigned max_depth = 1;
-    //unsigned fields_count = 1;
 }
 
 Simulation::Simulation(const Geometry *_volume, 
@@ -36,14 +20,6 @@ Simulation::Simulation(const Geometry *_volume,
 	volume(_volume)
 {
 }
-
-Simulation::~Simulation() {}
-
-// compute paths
-//void Simulation::run(const Particle & particle, double start_time, double stop_time)
-//{
-// ...
-//}
 
 int Simulation::get_field_degree(int axis)
 // TODO int Simulation::get_field_degree(Vertex* vertex, int axis)
@@ -77,13 +53,11 @@ double Simulation::get_field_acceleration(Vertex* vertex, int axis)
     return c;
 }
 
-// generate the next pathlet from the event using fields
+// generate the next Pathlet from the event using fields
 Pathlet* Simulation::solve_pathlet(Vertex *start)
 {
-    // TODO seperate polynomial solutions from Runge-Kutta
+    // TODO separate polynomial solutions from Runge-Kutta
     polynomial p[3]; // TODO make dimensionality a parameter
-    double stable_time = 0;
-
     for (int axis = 0; axis < 3; axis++) // TODO make dimensionality a parameter
     {
         int degree = get_field_degree(axis);
@@ -107,88 +81,19 @@ Pathlet* Simulation::solve_pathlet(Vertex *start)
             p[axis] = polynomial(1,c);
         }
         else
-        { 	// TODO support polynomial fields with direct integration
+        { 	// TODO support polynomial fields with direct integration...
             cerr << "A polynomial path degree of " << degree << " not supported." << endl;
             abort();
         }
-        // TODO look for any other solution type
-        //cout << "advance[" << degree << "]: " << p[axis] << endl;
-
-        double t = p[axis].get_stable_max();
-        if (stable_time > 0 and stable_time < t)
-            stable_time = t;
+        // TODO look for any other solution type...
     }
 
-    double time = start->get_time() + stable_time;
     Pathlet* pathlet = new Pathlet(p, start, 0);
-    double x[3], v[3];
-    pathlet->get_position(time, x);
-    pathlet->get_velocity(time, v);
-    AnnihilationEvent* event = new AnnihilationEvent(time, x, v);
-    Vertex* stop = new Vertex(event, x ,v);
-    pathlet->set_stop_vertex(stop);
-
+    assert(pathlet);
     return pathlet;
 }
 
-/*
-   Pathlet* Simulation::advance(ParticleEvent *event)
-   {
-// TODO seperate polynomial solutions from Runge-Kutta
-polynomial p[3]; // TODO make dimensionality a parameter
-
-for (int axis = 0; axis < 3; axis++) // TODO make dimensionality a parameter
-{
-int degree = 1;
-vector<Field*>::iterator f;
-for (f = fields.begin(); f != fields.end(); f++)
-{
-Field* field = *f;
-int d = field->get_degree(event, axis); // TODO support time varying fields
-if (d > degree)
-degree = d;	
-}
-
-if (degree == 2)
-{
-double c[3] = {
-event->get_position(axis), // TODO move outside
-event->get_out(axis), // TODO move outside
-0
-};
-vector<Field*>::iterator f;
-for (f = fields.begin(); f != fields.end(); f++)
-{
-Field* field = *f; // TODO support time varying fields
-c[2] += 0.5 * field->get_acceleration(event, axis); 
-}
-
-p[axis] = polynomial(2,c);
-}
-else if (degree == 1) // TODO check non-negative 
-{
-double c[2] = {
-event->get_position(axis), // TODO move outside
-event->get_out(axis)  // TODO move outside
-};
-//if (c[1] == 0) exit(0); // not sure what the point of this is ...
-p[axis] = polynomial(1,c);
-}
-else
-{ 	// TODO support polynomial fields with direct integration
-cerr << "A polynomial path degree of " << degree << " not supported." << endl;
-abort();
-}
-// TODO look for any other solution type
-//cout << "advance[" << degree << "]: " << p[axis] << endl;
-}
-
-return new Pathlet(p);
-}
- */
-
 // compute many paths
-//void Simulation::run(double start_time, double stop_time, int count, Path** paths)
 int Simulation::run(double start_time, double stop_time, int count)
 {
     int final_count = 0;
@@ -201,7 +106,7 @@ int Simulation::run(double start_time, double stop_time, int count)
     return final_count;
 }
 
-Vertex* Simulation::get_vertex(double start_time, double stop_time)
+Vertex* Simulation::get_first_vertex(double start_time, double stop_time)
 {
     double sources_strength = 0;  // expected number of creation 
     vector<Source*>::iterator s;
@@ -237,53 +142,17 @@ Vertex* Simulation::get_vertex(double start_time, double stop_time)
 }
 
 // compute one path	
-//Path* Simulation::run(double start_time, double stop_time)
 bool Simulation::run(double start_time, double stop_time)
 {
-    cout << "passed to run: start_time = " << start_time << " stop_time = " << stop_time << endl;
+    cout << "Passed to run: { start_time = " << start_time << ", stop_time = " << stop_time << "}" << endl;
 
-
-    /*
-    Source* source = 0;	
-
-    double sources_strength = 0;  // expected number of creation 
-    // events in time (stop - start)
-    vector<Source*>::iterator s;
-    for (s = sources.begin(); s != sources.end(); s++)
-    {
-        // calculate source strengths for all times ...
-        sources_strength += (*s)->get_strength(start_time, stop_time);
-    }
-    //double min_time = start_time;
-    double random_strength = randomInterval();
-    for (s = sources.begin(); s != sources.end(); s++)
-    {
-        // TODO calculate source strengths for different times ...
-        // ...
-        // TODO pick a sources correctly
-        source = *s; // TODO fix this hack (only work with one source)
-    }
-
-    if (not source) 
-    {
-        cerr << "no sources found" << endl;
-        abort(); // TODO throw error ?
-    }
-
-    Vertex* vertex = source->create_vertex(start_time, stop_time);
-    if (not vertex)
-    {
-        cerr << "No vertex created by source." << endl;
-        abort(); // TODO throw error ?
-    }
-    */
-    Vertex* vertex = get_vertex(start_time, stop_time);
+    Vertex* vertex = get_first_vertex(start_time, stop_time);
     Path* path = new Path(vertex); // TODO add args
     cout << "setting path start time to " << vertex->get_time() << " sec" << endl;
     paths.push_back(path);
 
     //Geometry* last_geometry = source->geometry;
-    Geometry* last_geometry = 0;
+    const Geometry* last_geometry = ((CreationEvent*)vertex->get_event())->geometry;
 
     // TODO while (start_time < t < stop_time)	
     int runs = 0;
@@ -305,14 +174,18 @@ bool Simulation::run(double start_time, double stop_time)
         pathlet = solve_pathlet(vertex); // TODO use solver
         if (!pathlet)
         {
-            cerr << "No pathlet. Can't identify next event." << endl;
+            cerr << "No pathlet solved. Can't identify next event." << endl;
             abort();
         }
+        double stable_time = pathlet->get_stable_time();  // yes! This is the way to do it!
         double min_time = vertex->get_time();
-        cout << "vertex->get_time() = " << vertex->get_time() << endl;
-        vertex = pathlet->get_stop_vertex();     // iterates to next pathlet
-        double max_time = vertex->get_time();
+        double max_time = min_time + stable_time;  // yes! This is the way to do it!
+        //vertex = pathlet->get_stop_vertex();     // iterates to next vertex
+        //assert(vertex);
+        //double max_time = vertex->get_time();    // <- XXX this is all crap!
 
+        cout << "stable_time = " << stable_time << endl;
+        cout << "min_time = " << min_time << endl;
         cout << "max_time = " << max_time << endl;
         cout << "stop_time = " << stop_time << endl;
 
@@ -369,7 +242,8 @@ bool Simulation::run(double start_time, double stop_time)
             cout << "Path out of bounds." << endl;
             best_event = out_of_bounds;
             out_of_bounds->out_of_bounds = true; // TODO add to constructor
-            max_time = vertex->get_time();
+            //max_time = vertex->get_time();
+            max_time = out_of_bounds->time;
             running = false;
         }
         else
@@ -388,9 +262,11 @@ bool Simulation::run(double start_time, double stop_time)
             running = true;
         }
 
-        vertex->set_event(best_event);
+        // TODO make new vertex and increment
+        vertex = new Vertex(best_event, pathlet, 0);
+        //vertex->set_event(best_event);
+        best_event->redirect_vertex(vertex); // TODO move to vertex constructor
         path->append(pathlet, vertex);
-        best_event->redirect_vertex(vertex);
 
         int err_count = path->check(0.01);
         if (err_count)
@@ -413,63 +289,57 @@ bool Simulation::run(double start_time, double stop_time)
     return path;
 }
 
-//void Simulation::addVectorField(VectorField *field)
 void Simulation::addField(Field *field)
 {
-    //octree->setup_vector_fields(&field);
     fields.push_back(field);
 }
 
-//void Simulation::addSurface(Surface * _surface)
-//void Simulation::addSurface(STLSurface * stl_surface)
 void Simulation::addGeometry(Geometry *geometry)
 {
-    //octree->walls = stl_surface->stl_file;
     geometries.push_back(geometry);
 }
 
 void Simulation::addSource(Source *source)
 {
-    //octree->walls = stl_surface->stl_file;
     sources.push_back(source);
 }
 
-void Simulation::writeMathematicaGraphics(ofstream &math_file)
+void Simulation::writeMathematicaGraphics(ostream &out)
 {
-    writeMathematicaGraphics(math_file, earliest_time, latest_time);
+    writeMathematicaGraphics(out, earliest_time, latest_time);
 }
 
-void Simulation::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
+void Simulation::writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time)
 {
-    math_file << "Show[" << endl;
+    out << "Show[" << endl;
 
     vector<Source*>::iterator s;
     for	(s = sources.begin(); s != sources.end(); s++)
     {
         Geometry* geometry = (*s)->geometry;
-        geometry->writeMathematicaGraphics(math_file, start_write_time, start_write_time);
-        math_file << ", " << endl;
+        geometry->writeMathematicaGraphics(out, start_write_time, start_write_time);
+        out << ", " << endl;
     }
 
     vector<Geometry*>::iterator g;
     for	(g = geometries.begin(); g != geometries.end(); g++)
     {
         Geometry* geometry = *g;
-        geometry->writeMathematicaGraphics(math_file, start_write_time, start_write_time);
-        math_file << ", " << endl;
+        geometry->writeMathematicaGraphics(out, start_write_time, start_write_time);
+        out << ", " << endl;
     }
 
     vector<Path*>::iterator p;
     for	(p = paths.begin(); p != paths.end(); p++)
     {
         Path* path = *p;
-        path->writeMathematicaGraphics(math_file, start_write_time, stop_write_time);
-        math_file << ", " << endl;
+        path->writeMathematicaGraphics(out, start_write_time, stop_write_time);
+        out << ", " << endl;
     }
     /*
      */
-    math_file << "PlotRange -> {{-8, 8}, {-8,8}, {-8, 8}}" << endl;
-    math_file << "]" << endl;
+    out << "PlotRange -> {{-8, 8}, {-8,8}, {-8, 8}}" << endl;
+    out << "]" << endl;
 }
 // TODO add range to Visulisation class?
 

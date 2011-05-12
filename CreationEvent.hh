@@ -4,11 +4,13 @@
 #include <string>
 #include <iostream>
 #include "ParticleEvent.hh"
+#include "Geometry.hh"
 //#include "Path.hh"
 
 
 using namespace std;
 class Pathlet;
+class Source;
 
 /**
  * CreationEvent
@@ -17,12 +19,15 @@ class Pathlet;
  */
 class CreationEvent : public ParticleEvent
 {
+  public:
+    //const Source* _source;
+    const Geometry* geometry;
 	//Pathlet* after;
 	//double out[3];
 	
-public:
-	CreationEvent(double t, double x[3], double v[3])
-	: ParticleEvent(t,x,v)
+  public:
+	CreationEvent(double t, double x[3], double v[3], const Geometry* _geometry)
+	: ParticleEvent(t,x,v), geometry(_geometry)
 	{
 		//set_position(x);
 		//set_velocity(v);

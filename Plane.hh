@@ -89,8 +89,8 @@ public:
 	InteractionEvent* interact(Pathlet* pathlet, double start_time, double stop_time) const;
 	InteractionEvent* selfinteract(Pathlet* pathlet, double start_time, double stop_time) const;
     double* get_random_point() const;
-	void writeMathematicaGraphics(ofstream & math_file);
-	void writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop);
+	void writeMathematicaGraphics(ostream &out);
+	void writeMathematicaGraphics(ostream &out, double start_time, double stop_stop);
 };
 
 
@@ -98,9 +98,9 @@ template <dimension n, codimension k>
 InteractionEvent* 
 Plane<n,k>::interact(Pathlet* pathlet, double start_time, double stop_time) const
 {
-    cout << "Looking for interaction in Plane<" << n << "," << k << ">." << endl;
+    cout << "Looking for interaction in Plane<" << n << "," << k << ">..." << endl;
     polynomial p = 0;
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++) 
     {
         polynomial q = pathlet->get_curve(i);
         q *= normal[i];
@@ -114,8 +114,9 @@ Plane<n,k>::interact(Pathlet* pathlet, double start_time, double stop_time) cons
     for (int i = 0; i < n_roots; i++)
     {
         double t = root[i] + pathlet->get_start_time();
-        cout << root[i] << " + ";
-        cout << pathlet->get_start_time() << endl;
+        cout << "i-th root + pathlet start time = " 
+             << root[i] << " + " << pathlet->get_start_time() << endl;
+
         if (t > stop_time)
             return 0;
 
@@ -197,7 +198,7 @@ Plane<n,k>::get_random_point() const
 
 template <dimension n, codimension k>
 void 
-Plane<n,k>::writeMathematicaGraphics(ofstream & math_file) 
+Plane<n,k>::writeMathematicaGraphics(ostream & out) 
 {
     // TODO principle axis
     /*
@@ -217,7 +218,7 @@ Plane<n,k>::writeMathematicaGraphics(ofstream & math_file)
        << "(nc -" << center[(axis+1)%3] << "*u - " << center[(axis+2)%3] << "*v) / " << center[axis] << ", "
        << "{u, -1, 1}, {v, -1, 1}];";
      */
-    math_file << "Plot3D[ "
+    out << "Plot3D[ "
         << "(" << nc << " - " << normal[0] << "*x - " << normal[1] << "*y) / " << normal[2] << ", "
         << "{x, -4, 4}, {y, -4, 4}, Mesh -> None,"
         << "PlotStyle -> Directive[LightGray, Specularity[White, 30]] ]";
@@ -225,9 +226,9 @@ Plane<n,k>::writeMathematicaGraphics(ofstream & math_file)
 
 template <dimension n, codimension k>
 void 
-Plane<n,k>::writeMathematicaGraphics(ofstream &math_file, double start_time, double stop_stop)
+Plane<n,k>::writeMathematicaGraphics(ostream &out, double start_time, double stop_stop)
 {
-    writeMathematicaGraphics(math_file);
+    writeMathematicaGraphics(out);
 }
 
 #endif

@@ -45,6 +45,7 @@ Vertex::Vertex(Event* _event , Pathlet* _before, Pathlet* _after)
         before->get_position(time, position);
         before->get_velocity(time, in);
     }
+    // TODO redirect from event
     if (order > 0)
         for (unsigned k = 0; k < 3; k++)
             out[k] = in[k];
@@ -101,12 +102,17 @@ void Vertex::set_out(const double p[3])
         out[i] = p[i];
 }
 
-
 void Vertex::set_event(Event* _event)
 {
     assert(_event);
     event = _event;
     //time = event->time;
+}
+
+Event* Vertex::get_event()
+{
+    assert(event);
+    return event;
 }
 
 void Vertex::set_before(Pathlet* _before) 

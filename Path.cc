@@ -261,16 +261,33 @@ void Pathlet::set_stop_vertex(Vertex* vertex)
     stop->set_before(this);
 }
 
+double Pathlet::get_stable_time(int axis)
+{
+    return curve[axis % 3].get_stable_max();
+}
+
+double Pathlet::get_stable_time()
+{
+    double stable_time = get_stable_time(0);
+    for (int axis = 1; axis < 3; axis++)
+    {
+        double t = get_stable_time(axis);
+        if (stable_time > t)
+            stable_time = t;
+    }
+    return stable_time;
+}
+
 double Pathlet::get_start_time()
 {
-	assert(start);
-	return start->get_time();
+    assert(start);
+    return start->get_time();
 }
 
 double Pathlet::get_stop_time()
 {
-	assert(stop);
-	return stop->get_time();
+    assert(stop);
+    return stop->get_time();
 }
 
 const polynomial & Pathlet::get_curve(int i) const
@@ -281,117 +298,117 @@ const polynomial & Pathlet::get_curve(int i) const
 //const double[3] & Path::get_position(double time)
 void Path::get_position(double time, double position[3])
 {
-	cout << "get_position()" << endl;
-	assert(start);
-	assert(stop);
+    cout << "get_position()" << endl;
+    assert(start);
+    assert(stop);
     assert(time >= start->get_time());
     assert(time < stop->get_time());
 
-	vector<Pathlet*>::iterator p;
-	for (p = pathlets.begin(); p != pathlets.end(); p++)
+    vector<Pathlet*>::iterator p;
+    for (p = pathlets.begin(); p != pathlets.end(); p++)
     {
-		Pathlet* pathlet = *p;
-		double start_time = pathlet->start->get_time();
+        Pathlet* pathlet = *p;
+        double start_time = pathlet->start->get_time();
         double stop_time = pathlet->stop->get_time();
 
-		if (time >= start_time and time <= stop_time)
+        if (time >= start_time and time <= stop_time)
         {
-			cout << "get_position()" << endl;
-	    	pathlet->get_position(time, position);
-            return;
-        }
-	}
-
-	/*
-	for (int i = 0; i < count; i++)
-    {
-        if (time >= pathlets[i]->start_time
-        and time <= pathlets[i]->stop_time)
-        {
-	    	pathlets[i]->get_position(time, position);
+            cout << "get_position()" << endl;
+            pathlet->get_position(time, position);
             return;
         }
     }
-	*/
-	cerr << "request for range out of bound in get_position" << endl;
+
+    /*
+       for (int i = 0; i < count; i++)
+       {
+       if (time >= pathlets[i]->start_time
+       and time <= pathlets[i]->stop_time)
+       {
+       pathlets[i]->get_position(time, position);
+       return;
+       }
+       }
+     */
+    cerr << "request for range out of bound in get_position" << endl;
     assert(false);
 }
 /*
-double Path::get_position(double start, double stop, double position[3])
-{
-    assert(start >= start_time);
-    assert(start < stop_time);
-    assert(stop > start_time);
-    assert(stop <= stop_time);
-    assert(start_time < stop_time);
-    assert(start < stop);
-    for (int i = 0; i < count; i++)
-    {
-        if (start >= sample[i].start_time 
-        and start < sample[i].stop_time)
-        {
-            if (stop > sample[i].stop_time)
-                stop = sample[i].stop_time;
-	    sample[i].get_position(stop, position);
-            return stop;
-        }
-    }
-    cerr << "ran out of samples." << endl;
-    cerr << "start = " << start << " stop = " << stop << endl;
-    cerr << "start_time = " << start_time << " stop_time = " << stop_time << endl;
-    assert(false);
-}
-*/
+   double Path::get_position(double start, double stop, double position[3])
+   {
+   assert(start >= start_time);
+   assert(start < stop_time);
+   assert(stop > start_time);
+   assert(stop <= stop_time);
+   assert(start_time < stop_time);
+   assert(start < stop);
+   for (int i = 0; i < count; i++)
+   {
+   if (start >= sample[i].start_time 
+   and start < sample[i].stop_time)
+   {
+   if (stop > sample[i].stop_time)
+   stop = sample[i].stop_time;
+   sample[i].get_position(stop, position);
+   return stop;
+   }
+   }
+   cerr << "ran out of samples." << endl;
+   cerr << "start = " << start << " stop = " << stop << endl;
+   cerr << "start_time = " << start_time << " stop_time = " << stop_time << endl;
+   assert(false);
+   }
+ */
 
 /*
-double Path::getMaximum(double start, double stop, const double direction[3])
+   double Path::getMaximum(double start, double stop, const double direction[3])
+   {
+//if (start < start_time) 
+if (not (start < stop_time)) 
 {
-    //if (start < start_time) 
-    if (not (start < stop_time)) 
-    {
-        cerr << start << " " << stop_time << endl;
-	cerr << visable() << endl;
-	cerr.flush();
-    }
-    assert(start >= start_time);
-    assert(start < stop_time);
-    assert(stop > start_time);
-    assert(stop <= stop_time);
-    assert(start_time < stop_time);
-    assert(start < stop);
-
-    // get first distance 
-    double maximum;
-    int i = 0;
-    while (i < count) {
-        if (start >= sample[i].start_time 
-        and start < sample[i].stop_time)
-        {
-	    // the most extreme distance must at least as extreme as this point
-            maximum = sample[i].getMaximum(start, stop, direction);
-	    break;
-	}
-	i++;
-    }
-
-    // we got the first point, now continue on looking for more extreme points
-    i++;
-    while (i < count)
-    {
-        if (stop >= sample[i].start_time)
-        {
-            // get maximum distance for this segment
-	    double max = sample[i].getMaximum(start, stop, direction);
-
-	    // see if this is more extreme than any other point so far
-	    if (max > maximum)
-	        maximum = max;
-        }
-	i++;
-    }
-    return maximum;
+cerr << start << " " << stop_time << endl;
+cerr << visable() << endl;
+cerr.flush();
 }
-*/
+assert(start >= start_time);
+assert(start < stop_time);
+assert(stop > start_time);
+assert(stop <= stop_time);
+assert(start_time < stop_time);
+assert(start < stop);
+
+// get first distance 
+double maximum;
+int i = 0;
+while (i < count) {
+if (start >= sample[i].start_time 
+and start < sample[i].stop_time)
+{
+// the most extreme distance must at least as extreme as this point
+maximum = sample[i].getMaximum(start, stop, direction);
+break;
+}
+i++;
+}
+
+// we got the first point, now continue on looking for more extreme points
+i++;
+while (i < count)
+{
+if (stop >= sample[i].start_time)
+{
+// get maximum distance for this segment
+double max = sample[i].getMaximum(start, stop, direction);
+
+// see if this is more extreme than any other point so far
+if (max > maximum)
+maximum = max;
+}
+i++;
+}
+return maximum;
+}
+ */
 
 // tests a particle paths continuity
 // reports number of errors
@@ -401,35 +418,35 @@ int Path::check(double epsilon)
     double last_position[3];
     double last_velocity[3];
     double position[3];
-	double start_time = start->get_time();
-	double stop_time = stop->get_time();
+    double start_time = start->get_time();
+    double stop_time = stop->get_time();
     double last_time = start_time;
     //int i = 0;
-	vector<Pathlet*>::iterator p;
-	for (p = pathlets.begin(); p != pathlets.end(); p++)
+    vector<Pathlet*>::iterator p;
+    for (p = pathlets.begin(); p != pathlets.end(); p++)
     {
-		Pathlet* pathlet = *p;
+        Pathlet* pathlet = *p;
         double pathlet_start_time = pathlet->start->get_time();
         double pathlet_stop_time = pathlet->stop->get_time();
         if (pathlet_start_time > pathlet_stop_time)
         {
             error_count++;
             cerr << "Pathlet start time is after stop time." << endl
-			     << "Pathlet start time is " << start << " sec and "
-                 << "Pathlet stop time is " << pathlet_stop_time << " sec." << endl
-				 << "Can't continue." << endl;
-			return error_count;
+                << "Pathlet start time is " << start << " sec and "
+                << "Pathlet stop time is " << pathlet_stop_time << " sec." << endl
+                << "Can't continue." << endl;
+            return error_count;
         }
-		pathlet->get_position(pathlet_start_time, position);
-		if (p == pathlets.begin())
+        pathlet->get_position(pathlet_start_time, position);
+        if (p == pathlets.begin())
         {
             if (pathlet_start_time != start_time)
             {
                 error_count++;
                 cerr << "The first sample start time "
-                     << "does not match the path start time." << endl
-                     << "First Sample start time is " << start << " sec and "
-                     << "Path start time is " << start_time << " sec." << endl;
+                    << "does not match the path start time." << endl
+                    << "First Sample start time is " << start << " sec and "
+                    << "Path start time is " << start_time << " sec." << endl;
             }
         }
         else
@@ -438,11 +455,11 @@ int Path::check(double epsilon)
             {
                 error_count++;
                 cerr << "Sample " << /*i <<*/ " start time "
-                     << "does not match the previous samples end time." << endl
-                     << "Sample start time is " << pathlet_start_time << " sec and "
-                     << "previous sample stop time was " 
-                     << last_time << " sec." << endl
-					 << "difference is " << pathlet_start_time - last_time << endl;
+                    << "does not match the previous samples end time." << endl
+                    << "Sample start time is " << pathlet_start_time << " sec and "
+                    << "previous sample stop time was " 
+                    << last_time << " sec." << endl
+                    << "difference is " << pathlet_start_time - last_time << endl;
             }
             else
             {
@@ -458,68 +475,68 @@ int Path::check(double epsilon)
                 {
                     error_count++;
                     cerr << "Sample start position did not match "
-                         << "previous sample end position." << endl;
+                        << "previous sample end position." << endl;
                     cerr << "Sample start position is " << "(" 
-                         << position[0] << ", "
-                         << position[1] << ", "
-                         << position[2] << ")." << endl;
+                        << position[0] << ", "
+                        << position[1] << ", "
+                        << position[2] << ")." << endl;
                     cerr << "Previous sample end position was " << "(" 
-                         << last_position[0] << ", "
-                         << last_position[1] << ", "
-                         << last_position[2] << ")." << endl;
+                        << last_position[0] << ", "
+                        << last_position[1] << ", "
+                        << last_position[2] << ")." << endl;
                     cerr << endl;
                 }
 
-				/*
-                double velocity_error_count = 0;
-                for (int j = 0; j < 3; j++)
-                {
-                    double d = velocity[j] - last_velocity[j];
-                    if (d > epsilon or -d > epsilon)
-                        velocity_error_count++;
-                }
-                if (velocity_error_cou)
-                {
-                    error_count++;
-                    cerr << "Sample start velocity did not match "
-                         << "previous sample end position." << endl;
-                    cerr << "Sample start velocity is " << "(" 
-                         << position[0] << ", "
-                         << position[1] << ", "
-                         << position[2] << ")." << endl;
-                    cerr << "Previous sample end velocity was " << "(" 
-                         << last_position[0] << ", "
-                         << last_position[1] << ", "
-                         << last_position[2] << ")." << endl;
-                    cerr << endl;
-                }
-				*/
+                /*
+                   double velocity_error_count = 0;
+                   for (int j = 0; j < 3; j++)
+                   {
+                   double d = velocity[j] - last_velocity[j];
+                   if (d > epsilon or -d > epsilon)
+                   velocity_error_count++;
+                   }
+                   if (velocity_error_cou)
+                   {
+                   error_count++;
+                   cerr << "Sample start velocity did not match "
+                   << "previous sample end position." << endl;
+                   cerr << "Sample start velocity is " << "(" 
+                   << position[0] << ", "
+                   << position[1] << ", "
+                   << position[2] << ")." << endl;
+                   cerr << "Previous sample end velocity was " << "(" 
+                   << last_position[0] << ", "
+                   << last_position[1] << ", "
+                   << last_position[2] << ")." << endl;
+                   cerr << endl;
+                   }
+                 */
             }
         }
 
         //double stop = pathlet->stop->event->get_time();
-		//sample[i].get_position(stop, last_position);
+        //sample[i].get_position(stop, last_position);
         if (pathlet_stop_time < pathlet_start_time)
         {
             error_count++;
             cerr << "Pathlet stop time is before start time." << endl
-			     << "Pathlet stop time is " << stop << " sec and "
-                 << "Pathlet start time is " << pathlet_start_time << " sec." << endl
-				 << "Can't continue." << endl;
-			return error_count;
+                << "Pathlet stop time is " << stop << " sec and "
+                << "Pathlet start time is " << pathlet_start_time << " sec." << endl
+                << "Can't continue." << endl;
+            return error_count;
         }
-		pathlet->get_position(pathlet_stop_time, last_position);
-		//pathlet->get_velocity(stop, last_velocity);
+        pathlet->get_position(pathlet_stop_time, last_position);
+        //pathlet->get_velocity(stop, last_velocity);
         //if (i == pathlets.size())
-		if (p == pathlets.end())
+        if (p == pathlets.end())
         {
             if (pathlet_stop_time != stop_time)
             {
                 error_count++;
                 cerr << "the last sample stop time "
-                     << "does not match the path stop time." << endl
-                     << "Last sample stop time is " << pathlet_stop_time << " sec and "
-                     << "Path stop time is " << stop_time << " sec." << endl;
+                    << "does not match the path stop time." << endl
+                    << "Last sample stop time is " << pathlet_stop_time << " sec and "
+                    << "Path stop time is " << stop_time << " sec." << endl;
             }
         }
         last_time = pathlet_stop_time;
@@ -527,9 +544,9 @@ int Path::check(double epsilon)
     if (error_count > 0)
     {
         cerr << "There were " << error_count << " errors with "
-             << "the start and stop times." << endl
-             << "No point in checking more. "
-             << "Fix these first. " << endl;
+            << "the start and stop times." << endl
+            << "No point in checking more. "
+            << "Fix these first. " << endl;
     }
     return error_count;
 }
@@ -551,89 +568,89 @@ bool Path::visable()
 
 //unsigned Path::add(const Pathlet &_sample)
 //{
-	/*
-	sample.push_back(_sample);
-	count = sample.size();
-	if (_sample.reflection)
-	{
-	    _reflections++;
-	    double p[3];
-	    double floor_level = 0.000001;
-	    _sample.getStopPosition( p );
-	    if (p[1] < floor_level) {
-	    	hide();
-		//cout << "hiding because reflection at ("
-		//     << p[0] << ", " << p[1] << ", " << p[2] 
-		//     << ") was below " << floor_level << endl;
-	    }
-	    //else
-		//cout << "not hiding because of reflection" << endl;
-	}
-	*/
+/*
+   sample.push_back(_sample);
+   count = sample.size();
+   if (_sample.reflection)
+   {
+   _reflections++;
+   double p[3];
+   double floor_level = 0.000001;
+   _sample.getStopPosition( p );
+   if (p[1] < floor_level) {
+   hide();
+//cout << "hiding because reflection at ("
+//     << p[0] << ", " << p[1] << ", " << p[2] 
+//     << ") was below " << floor_level << endl;
+}
+//else
+//cout << "not hiding because of reflection" << endl;
+}
+ */
 //}
 
 unsigned Path::discontinuities()
 {
-	return _reflections;
+    return _reflections;
 }
 
 void Path::writeJSON(ostream &out, double start_write_time, double stop_write_time)
 {
-	// determine starting pathlet
-	assert(stop_write_time > start_write_time);
+    // determine starting pathlet
+    assert(stop_write_time > start_write_time);
     out << "{" << endl 
         << right << "\"pathlets\" : [" << endl << right;
-	vector<Pathlet*>::iterator p;
-	for (p = pathlets.begin(); p != pathlets.end(); p++)
-	{
-		Pathlet* pathlet = *p;
-		pathlet->writeJSON(out, start_write_time, stop_write_time);
-		if (p != --pathlets.end())
-			out << ", " << endl;
-	}
+    vector<Pathlet*>::iterator p;
+    for (p = pathlets.begin(); p != pathlets.end(); p++)
+    {
+        Pathlet* pathlet = *p;
+        pathlet->writeJSON(out, start_write_time, stop_write_time);
+        if (p != --pathlets.end())
+            out << ", " << endl;
+    }
     out << left << "]" << endl;
     out << "\"verticies\" : [" << endl;
-	vector<Vertex*>::iterator v;
-	for (v = verticies.begin(); v != verticies.end(); v++)
-	{
-		Vertex* vertex = *v;
-		vertex->writeJSON(out, start_write_time, stop_write_time);
-		if (v != --verticies.end())
-			out << ", " << endl;
-	}
+    vector<Vertex*>::iterator v;
+    for (v = verticies.begin(); v != verticies.end(); v++)
+    {
+        Vertex* vertex = *v;
+        vertex->writeJSON(out, start_write_time, stop_write_time);
+        if (v != --verticies.end())
+            out << ", " << endl;
+    }
     out << "]" << endl << left  << "}";
 }
 
 void Path::writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time)
 {
-	// determine starting pathlet
-	assert(stop_write_time > start_write_time);
-	vector<Pathlet*>::iterator p;
-	for (p = pathlets.begin(); p != pathlets.end(); p++)
-	{
-		Pathlet* pathlet = *p;
-		//const double time = (stop_time - start_time)
-		//                  * (frame + segment / (segment_count - 1)) 
-		//                  / frame_count 
-		//                  + start_time;
-		//segment += 1.0;
-		pathlet->writeMathematicaGraphics(out, start_write_time, stop_write_time);
-		if (pathlet->stop)
-		{
-			out << ", " << endl;
-			stop->writeMathematicaGraphics(out, start_write_time, stop_write_time);
-		}
-		if (p != --pathlets.end())
-			out << ", " << endl;
-	}
+    // determine starting pathlet
+    assert(stop_write_time > start_write_time);
+    vector<Pathlet*>::iterator p;
+    for (p = pathlets.begin(); p != pathlets.end(); p++)
+    {
+        Pathlet* pathlet = *p;
+        //const double time = (stop_time - start_time)
+        //                  * (frame + segment / (segment_count - 1)) 
+        //                  / frame_count 
+        //                  + start_time;
+        //segment += 1.0;
+        pathlet->writeMathematicaGraphics(out, start_write_time, stop_write_time);
+        if (pathlet->stop)
+        {
+            out << ", " << endl;
+            stop->writeMathematicaGraphics(out, start_write_time, stop_write_time);
+        }
+        if (p != --pathlets.end())
+            out << ", " << endl;
+    }
 }
 
 void Pathlet::writeJSON(ostream &out, double start_write_time, double stop_write_time)
 {
     // TODO ...
-	assert(stop_write_time > start_write_time);
-	assert(scale > 0);
-	out << "{" << endl 
+    assert(stop_write_time > start_write_time);
+    assert(scale > 0);
+    out << "{" << endl 
         << "\"curve\" : [" << endl;
     for (int i = 0; i < 3; i++)
     {
@@ -650,8 +667,8 @@ void Pathlet::writeJSON(ostream &out, double start_write_time, double stop_write
 
 void Pathlet::writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time)
 {
-	assert(stop_write_time > start_write_time);
-	assert(scale > 0);
-	out << "ParametricPlot3D[{" << curve[0] << ", " << curve[1] << ", " << curve[2] << "}, ";
-	out << "{x, " << 0 << ", " << (stop->get_time() - start->get_time()) / scale << "}]";
+    assert(stop_write_time > start_write_time);
+    assert(scale > 0);
+    out << "ParametricPlot3D[{" << curve[0] << ", " << curve[1] << ", " << curve[2] << "}, ";
+    out << "{x, " << 0 << ", " << (stop->get_time() - start->get_time()) / scale << "}]";
 }
