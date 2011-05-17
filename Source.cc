@@ -28,7 +28,7 @@ Vertex* Source::create_vertex(double start, double stop) const
         v[i] /= particle->mass;
 
     //return new CreationEvent(t, x, v);
-    return new Vertex(new CreationEvent(t,x,v,geometry), x, v);
+    return new Vertex(new CreationEvent(t,geometry), x, v);
 }
 
 double Source::get_strength(double start_time, double stop_time)

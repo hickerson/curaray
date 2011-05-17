@@ -29,9 +29,8 @@ class InteractionEvent
 	//const Surface*  surface;
 	
 public:
-	InteractionEvent(double t, const Geometry* _geometry, const double _normal[3],
-					 Pathlet* path_in, Pathlet* path_out) 
-		: ContinuityEvent(t, path_in, path_out), geometry(_geometry)
+	InteractionEvent(double t, const Geometry* _geometry, const double _normal[3])
+		: ContinuityEvent(t), geometry(_geometry)
 	{
         for (int i =0; i < 3; i++)
             normal[i] = _normal[i];
@@ -72,6 +71,6 @@ private:
     		out[i] -= 2*vn*normal[i];
 	}
 */
-	//virtual void writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time);
+	virtual void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time);
 };
 #endif

@@ -180,25 +180,25 @@ bool Simulation::run(double start_time, double stop_time)
         double stable_time = pathlet->get_stable_time();  // yes! This is the way to do it!
         double min_time = vertex->get_time();
         double max_time = min_time + stable_time;  // yes! This is the way to do it!
-        //vertex = pathlet->get_stop_vertex();     // iterates to next vertex
-        //assert(vertex);
-        //double max_time = vertex->get_time();    // <- XXX this is all crap!
+        if (max_time > stop_time)
+            max_time = stop_time;
 
         cout << "stable_time = " << stable_time << endl;
         cout << "min_time = " << min_time << endl;
         cout << "max_time = " << max_time << endl;
         cout << "stop_time = " << stop_time << endl;
 
-        if (max_time >= stop_time)
-        {
+            /*
+        if (max_time > stop_time)
+        //{
             max_time = stop_time;
             // TODO EndSimulationEvent
-            //vertex->set_event(0);
             //vertex->event->out_of_bounds = true;
             cout << "Found end time " << max_time << " sec." << endl;
             running = false;
             break;
         }
+        */
 
         // TODO handle decay events by setting maximum stop time early		
         // TODO handle other loss events
@@ -236,13 +236,12 @@ bool Simulation::run(double start_time, double stop_time)
 
         // TODO add volume to geometry list? Last?
         assert(volume); // TODO change to "volume" to "boundary"
-        InteractionEvent* out_of_bounds = volume->interact(pathlet, min_time, max_time);
+        InteractionEvent* out_of_bounds = volume->interact(pathlet, min_time, max_time); // TODO make out of bounds object
         if (out_of_bounds) 
         {   // terminate path since we didn't hit an object
-            cout << "Path out of bounds." << endl;
+            cout << "Path is out of bounds." << endl;
             best_event = out_of_bounds;
-            out_of_bounds->out_of_bounds = true; // TODO add to constructor
-            //max_time = vertex->get_time();
+            //out_of_bounds->out_of_bounds = true; // TODO add to constructor
             max_time = out_of_bounds->time;
             running = false;
         }
@@ -255,17 +254,24 @@ bool Simulation::run(double start_time, double stop_time)
                 last_geometry = best_geometry;
             }
             else
-            { 	// no better intersection found? 
-                cout << "Creating continuity event at time " << max_time << " sec." << endl;
-                best_event = new ContinuityEvent(max_time, pathlet, 0);
+            { 	
+                if (max_time == stop_time)
+                {
+                    running = false;
+                    best_event = new AnnihilationEvent(max_time);
+                }
+                else
+                {
+                    cout << "No interaction found. Creating continuity event at time " << max_time << " sec." << endl;
+                    best_event = new ContinuityEvent(max_time);
+                }
             }
-            running = true;
         }
 
-        // TODO make new vertex and increment
-        vertex = new Vertex(best_event, pathlet, 0);
-        //vertex->set_event(best_event);
-        best_event->redirect_vertex(vertex); // TODO move to vertex constructor
+        // make new vertex and increment
+        vertex = new Vertex(best_event, pathlet);
+        best_event->set_position(pathlet);
+        best_event->redirect_vertex(vertex);
         path->append(pathlet, vertex);
 
         int err_count = path->check(0.01);
@@ -336,12 +342,10 @@ void Simulation::writeMathematicaGraphics(ostream &out, double start_write_time,
         path->writeMathematicaGraphics(out, start_write_time, stop_write_time);
         out << ", " << endl;
     }
-    /*
-     */
-    out << "PlotRange -> {{-8, 8}, {-8,8}, {-8, 8}}" << endl;
+    out << "PlotRange -> {{-6, 6}, {-6,6}, {-6, 6}}" << endl;
     out << "]" << endl;
 }
-// TODO add range to Visulisation class?
+// TODO add range to Visualization class?
 
 #if 0
 const double frame_count = 1;

@@ -1,5 +1,27 @@
 #include "ParticleEvent.hh"
 
+ParticleEvent::ParticleEvent(double t)
+: Event(t)
+{
+    for (unsigned k = 0; k < 3; k++)
+        position[k] = 0;
+}
+
+ParticleEvent::ParticleEvent(double t, const double _position[3])
+: Event(t)
+{
+    for (unsigned k = 0; k < 3; k++)
+        position[k] = _position[k];
+}
+
+ParticleEvent::ParticleEvent(double t, const Pathlet* pathlet)
+: Event(t)
+{
+    if (pathlet)
+        pathlet->get_position(t, position);
+}
+
+/*
 ParticleEvent::ParticleEvent(double t, const double x[3], const double v[3])
 : Event(t)
 {
@@ -29,10 +51,10 @@ ParticleEvent::ParticleEvent(double t, Pathlet* path_in, Pathlet* path_out)
         for (unsigned k = 0; k < 3; k++)
             out[k] = in[k];
 }
+*/
 
 void ParticleEvent::redirect_vertex(Vertex* vertex)
 {
-    double x[3]; // TODO
     double p[3];
     assert(vertex);
     vertex->get_in(p);
@@ -51,29 +73,19 @@ void ParticleEvent::writeJSON(ostream &out, double start_write_time, double stop
     }
 }
 
+/*
 void ParticleEvent::writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time)
 {
     //if (get_time() >= start_write_time and get_time() < stop_write_time)
+    if (time >= start_write_time and time < stop_write_time)
     {
-        out << "Graphics3D[{Blue, Sphere [{"
+        out << "Graphics3D[{Yellow, Sphere [{"
             << get_position(0) << ", " << get_position(1) << ", " << get_position(2) << "}, "
             << "0.1]}]"; // TODO radius
     }
 }
+*/
 
-/*
-	ParticleEvent::ParticleEvent(double t)
-		: Event(t) 
-	{
-	}
-
-	ParticleEvent::ParticleEvent(double t, double x[3]) 
-		: Event(t) 
-	{
-		for (int i = 0; i < 3; i++)
-			position[i] = x[i];
-	}
-*/	
 	//ParticleEvent::~ParticleEvent() {};
 
 	// XXX this copies the particle around for no reason
@@ -98,7 +110,8 @@ void ParticleEvent::writeMathematicaGraphics(ostream &out, double start_write_ti
     	for (unsigned i = 0; i < 3; i++)
     		velocity[i] -= 2*vn*normal[i];
 	}
-*/	
+*/
+
 double ParticleEvent::get_position(int i)
 {
     return position[i];
@@ -108,4 +121,10 @@ void ParticleEvent::set_position(double x[3])
 {
     for (int i=0; i<3; i++)
         position[i] = x[i];
+}
+
+void ParticleEvent::set_position(const Pathlet* pathlet)
+{
+    if (pathlet)
+        pathlet->get_position(time, position);
 }

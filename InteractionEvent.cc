@@ -1,12 +1,11 @@
 #include "InteractionEvent.hh"
 
-/*
-void InteractionEvent::writeMathematicaGraphics(ofstream &math_file, double start_write_time, double stop_write_time)
+void InteractionEvent::writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time)
 {
-	if (get_time() >= start_write_time and get_time() < stop_write_time)
-	{
-		math_file << "Graphics3D[{Black, Sphere [{"
-				 << get_position(0)<<","<<get_position(1)<<","<<get_position(2)<<"}, 0.01]}],"<<endl;
-	}
+    if (time >= start_write_time and time < stop_write_time)
+    {
+        out << "Graphics3D[{Yellow, Sphere [{"
+            << get_position(0) << ", " << get_position(1) << ", " << get_position(2) << "}, "
+            << "0.1]}]"; // TODO radius
+    }
 }
-*/

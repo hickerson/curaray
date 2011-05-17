@@ -32,11 +32,18 @@ public:
 */
 	
 public:
-	ContinuityEvent(double t, const double x[3], const double v[3])
-		: ParticleEvent(t,x,v)
+	ContinuityEvent(double t)
+		: ParticleEvent(t)
 	{
+        // order... ?
 	}
 
+	ContinuityEvent(double t, const double x[3])
+		: ParticleEvent(t,x)
+	{
+        // order... ?
+	}
+/*
 	ContinuityEvent(double t, Pathlet* path_in, Pathlet* path_out) 
 		: ParticleEvent(t, path_in, path_out)
 	{
@@ -46,7 +53,6 @@ public:
     			out[k] = in[k];
 	}
 
-/*
 	ContinuityEvent(double t)
 		: ParticleEvent(t)
 	{ 
@@ -61,6 +67,7 @@ public:
 	}	
 */
 
+/*
 	double get_in(int i)
 	{
 		return in[i];
@@ -70,9 +77,9 @@ public:
 	{
 		return out[i];
 	}
-
+*/
 	//~ContinuityEvent();
-	//virtual void writeMathematicaGraphics(ofstream &, double start_write_time, double stop_write_time);
+	virtual void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time);
 };
 
 #endif

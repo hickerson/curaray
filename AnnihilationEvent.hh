@@ -21,9 +21,8 @@ class AnnihilationEvent : public ParticleEvent
 	//double in[3];
 	
 public:
-	//AnnihilationEvent();
-	AnnihilationEvent(double t, double x[3], double v[3])
-	: ParticleEvent(t,x,v)
+	AnnihilationEvent(double t)
+	: ParticleEvent(t)
 	{
 		//set_position(x);
 		//set_velocity(v);
@@ -31,6 +30,7 @@ public:
 	
 
 	//~AnnihilationEvent();
+	virtual void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time);
 };
 
 #endif

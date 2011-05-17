@@ -21,10 +21,9 @@ Vertex::Vertex(double _time, const double x[3], const double v[3])
 Vertex::Vertex(Event* _event, const double x[3], const double v[3])
 {
     event = _event;
-    //time = event->time;
     before = 0;
     after = 0;
-    order = 1;
+    //order = 1;
     for (unsigned k = 0; k < 3; k++)
     {
         position[k] = x[k];
@@ -33,22 +32,21 @@ Vertex::Vertex(Event* _event, const double x[3], const double v[3])
     }
 }
 
-Vertex::Vertex(Event* _event , Pathlet* _before, Pathlet* _after) 
+//Vertex::Vertex(Event* _event , Pathlet* _before, Pathlet* _after) 
+Vertex::Vertex(Event* _event , Pathlet* _before) 
 {
     event = _event;
     before = _before;
-    after = _after;
-    order = 2;
+    //after = _after;
+    after = 0;
     if (before)
     {
         double time = event->time;
         before->get_position(time, position);
         before->get_velocity(time, in);
+        before->get_velocity(time, out);
+        //event->set_position(in);
     }
-    // TODO redirect from event
-    if (order > 0)
-        for (unsigned k = 0; k < 3; k++)
-            out[k] = in[k];
 }
 
 double Vertex::get_time()

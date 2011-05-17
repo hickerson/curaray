@@ -121,8 +121,7 @@ Plane<n,k>::interact(Pathlet* pathlet, double start_time, double stop_time) cons
             return 0;
 
         if (t > start_time)
-            return new InteractionEvent(t, this, normal, pathlet, 0);
-        //return new InteractionEvent(t, this, normal);
+            return new InteractionEvent(t, this, normal);
     }
 
     /*
@@ -178,8 +177,7 @@ Plane<n,k>::selfinteract(Pathlet* pathlet, double start_time, double stop_time) 
             return 0;
 
         if (t > start_time)
-            return new InteractionEvent(t, this, normal, pathlet, 0);
-            //return new InteractionEvent(t, this, normal);
+            return new InteractionEvent(t, this, normal);
     }
 
     return 0;

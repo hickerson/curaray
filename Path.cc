@@ -415,19 +415,62 @@ return maximum;
 int Path::check(double epsilon)
 {
     int error_count = 0;
+    int i = 0;
     double last_position[3];
     double last_velocity[3];
     double position[3];
-    double start_time = start->get_time();
-    double stop_time = stop->get_time();
-    double last_time = start_time;
-    //int i = 0;
+    double velocity[3];
+    double start_time;
+    double stop_time;
+    double last_time;
+
+    if (start)
+        start_time = start->get_time();
+    else
+    {
+        error_count++;
+        cerr << "There is no start vertex. Can't continue." << endl;
+        return error_count;
+    }
+
+    if (stop)
+        stop_time = stop->get_time();
+    else
+    {
+        error_count++;
+        cerr << "There is no stop vertex. Can't continue." << endl;
+        return error_count;
+    }
+
+    last_time = start_time;
     vector<Pathlet*>::iterator p;
     for (p = pathlets.begin(); p != pathlets.end(); p++)
     {
         Pathlet* pathlet = *p;
-        double pathlet_start_time = pathlet->start->get_time();
-        double pathlet_stop_time = pathlet->stop->get_time();
+        Vertex* pathlet_start = pathlet->start;
+        Vertex* pathlet_stop = pathlet->stop;
+        double pathlet_start_time;
+        double pathlet_stop_time;
+        i++;
+
+        if (pathlet_start)
+            pathlet_start_time = pathlet_start->get_time();
+        else
+        {
+            error_count++;
+            cerr << "There is no start vertex for pathlet " << i << ". Can't continue." << endl;
+            return error_count;
+        }
+
+        if (pathlet_stop)
+            pathlet_stop_time = pathlet_stop->get_time();
+        else
+        {
+            error_count++;
+            cerr << "There is no stop vertex for pathlet " << i << ". Can't continue." << endl;
+            return error_count;
+        }
+
         if (pathlet_start_time > pathlet_stop_time)
         {
             error_count++;
@@ -438,6 +481,7 @@ int Path::check(double epsilon)
             return error_count;
         }
         pathlet->get_position(pathlet_start_time, position);
+        pathlet->get_velocity(pathlet_start_time, velocity);
         if (p == pathlets.begin())
         {
             if (pathlet_start_time != start_time)
@@ -487,35 +531,31 @@ int Path::check(double epsilon)
                     cerr << endl;
                 }
 
-                /*
-                   double velocity_error_count = 0;
-                   for (int j = 0; j < 3; j++)
-                   {
-                   double d = velocity[j] - last_velocity[j];
-                   if (d > epsilon or -d > epsilon)
-                   velocity_error_count++;
-                   }
-                   if (velocity_error_cou)
-                   {
-                   error_count++;
-                   cerr << "Sample start velocity did not match "
-                   << "previous sample end position." << endl;
-                   cerr << "Sample start velocity is " << "(" 
-                   << position[0] << ", "
-                   << position[1] << ", "
-                   << position[2] << ")." << endl;
-                   cerr << "Previous sample end velocity was " << "(" 
-                   << last_position[0] << ", "
-                   << last_position[1] << ", "
-                   << last_position[2] << ")." << endl;
-                   cerr << endl;
-                   }
-                 */
+                double velocity_error_count = 0;
+                for (int j = 0; j < 3; j++)
+                {
+                    double d = velocity[j] - last_velocity[j];
+                    if (d > epsilon or -d > epsilon)
+                        velocity_error_count++;
+                }
+                if (velocity_error_count)
+                {
+                    error_count++;
+                    cerr << "Sample start velocity did not match "
+                        << "previous sample end position." << endl;
+                    cerr << "Sample start velocity is " << "(" 
+                        << velocity[0] << ", "
+                        << velocity[1] << ", "
+                        << velocity[2] << ")." << endl;
+                    cerr << "Previous sample end velocity was " << "(" 
+                        << last_velocity[0] << ", "
+                        << last_velocity[1] << ", "
+                        << last_velocity[2] << ")." << endl;
+                    cerr << endl;
+                }
             }
         }
 
-        //double stop = pathlet->stop->event->get_time();
-        //sample[i].get_position(stop, last_position);
         if (pathlet_stop_time < pathlet_start_time)
         {
             error_count++;
@@ -526,8 +566,7 @@ int Path::check(double epsilon)
             return error_count;
         }
         pathlet->get_position(pathlet_stop_time, last_position);
-        //pathlet->get_velocity(stop, last_velocity);
-        //if (i == pathlets.size())
+        pathlet->get_velocity(pathlet_stop_time, last_velocity);
         if (p == pathlets.end())
         {
             if (pathlet_stop_time != stop_time)
@@ -625,6 +664,9 @@ void Path::writeMathematicaGraphics(ostream &out, double start_write_time, doubl
 {
     // determine starting pathlet
     assert(stop_write_time > start_write_time);
+
+    assert(start);
+    start->writeMathematicaGraphics(out, start_write_time, stop_write_time);
     vector<Pathlet*>::iterator p;
     for (p = pathlets.begin(); p != pathlets.end(); p++)
     {
@@ -634,14 +676,13 @@ void Path::writeMathematicaGraphics(ostream &out, double start_write_time, doubl
         //                  / frame_count 
         //                  + start_time;
         //segment += 1.0;
+        assert(pathlet);
+        out << ", " << endl;
         pathlet->writeMathematicaGraphics(out, start_write_time, stop_write_time);
-        if (pathlet->stop)
-        {
-            out << ", " << endl;
-            stop->writeMathematicaGraphics(out, start_write_time, stop_write_time);
-        }
-        if (p != --pathlets.end())
-            out << ", " << endl;
+
+        assert (pathlet->stop);
+        out << ", " << endl;
+        pathlet->stop->writeMathematicaGraphics(out, start_write_time, stop_write_time);
     }
 }
 

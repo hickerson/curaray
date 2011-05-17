@@ -22,16 +22,20 @@ class CreationEvent : public ParticleEvent
   public:
     //const Source* _source;
     const Geometry* geometry;
-	//Pathlet* after;
-	//double out[3];
 	
   public:
+	CreationEvent(double t, const Geometry* _geometry)
+	: ParticleEvent(t), geometry(_geometry)
+	{
+	}
+  /*
 	CreationEvent(double t, double x[3], double v[3], const Geometry* _geometry)
 	: ParticleEvent(t,x,v), geometry(_geometry)
 	{
 		//set_position(x);
 		//set_velocity(v);
 	}
+    */
 	//~CreationEvent();
 
 /*
@@ -46,6 +50,7 @@ class CreationEvent : public ParticleEvent
 			out[i] = v[i];
 	}
 */
+	virtual void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time);
 };
 
 #endif

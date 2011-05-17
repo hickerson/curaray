@@ -20,24 +20,24 @@
  */
 class ParticleEvent : public Event
 {
-public:
 	double position[3];
-
-public:
-	Pathlet* before;
-	Pathlet* after;
-	double in[3];
-	double out[3];
-	unsigned order;
+	//Pathlet* before;
+	//Pathlet* after;
+	//double in[3];
+	//double out[3];
+	//unsigned order;
 	
-public:
-	bool out_of_bounds; // TODO clean up
+	//bool out_of_bounds; // TODO clean up
 	// Particle* particle; // reference particle type for scattering calculations
 
 public:
+	ParticleEvent(double t);
+	ParticleEvent(double t, const double x[3]);
+	ParticleEvent(double t, const Pathlet* pathlet);
+    /* taken over in Vertex...
 	ParticleEvent(double t, const double x[3], const double v[3]);
 	ParticleEvent(double t, Pathlet* path_in, Pathlet* path_out);
-
+    */
 public:
 /*
 	ParticleEvent(double t);
@@ -55,10 +55,11 @@ public:
 */	
 	double get_position(int i);
 	void set_position(double x[3]);
-
+	void set_position(const Pathlet* pathlet);
     virtual void redirect_vertex(Vertex* vertex);
+
 	virtual void writeJSON(ostream &out, double start_write_time, double stop_write_time);
-	virtual void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time);
+	virtual void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time) = 0;
 };
 
 #endif

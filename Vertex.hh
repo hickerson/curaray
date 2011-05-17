@@ -40,7 +40,8 @@ private:
 public:
 	//Vertex(double _time, const double x[3], const double v[3]);
 	Vertex(Event* _event, const double x[3], const double v[3]);
-	Vertex(Event* _event , Pathlet* _before, Pathlet* _after);
+	//Vertex(Event* _event , Pathlet* _before, Pathlet* _after);
+	Vertex(Event* _event , Pathlet* _before);
 
     double get_time();
 	double get_position(int i);
