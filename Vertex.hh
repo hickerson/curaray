@@ -17,7 +17,6 @@ class Pathlet;
 class Vertex 
 {
 public:
-	//double time;
 	double position[3];
 	double in[3];
 	double out[3];

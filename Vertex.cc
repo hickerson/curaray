@@ -23,7 +23,7 @@ Vertex::Vertex(Event* _event, const double x[3], const double v[3])
     event = _event;
     before = 0;
     after = 0;
-    //order = 1;
+    order = 0;
     for (unsigned k = 0; k < 3; k++)
     {
         position[k] = x[k];
@@ -37,8 +37,8 @@ Vertex::Vertex(Event* _event , Pathlet* _before)
 {
     event = _event;
     before = _before;
-    //after = _after;
     after = 0;
+    order = 0;
     if (before)
     {
         double time = event->time;

@@ -221,18 +221,20 @@ void Pathlet::get_position(double time, double position[3]) const
 {
 	assert(start);
     assert(time >= start->get_time());
+    double s = (time - start->get_time())/scale;
 
     for (int i = 0; i < 3; i++)
-		position[i] = curve[i].evaluate((time - start->get_time())/scale);
+		position[i] = curve[i].evaluate(s);
 }
 
 void Pathlet::get_velocity(double time, double velocity[3]) const
 {
 	assert(start);
     assert(time >= start->get_time());
+    double s = (time - start->get_time())/scale;
 
     for (int i = 0; i < 3; i++)
-		velocity[i] = curve[i].derivative((time - start->get_time())/scale);
+		velocity[i] = curve[i].derivative(s);
 }
 
 Vertex* Pathlet::get_start_vertex()
@@ -416,13 +418,15 @@ int Path::check(double epsilon)
 {
     int error_count = 0;
     int i = 0;
+    double start_position[3];
+    double start_velocity[3];
+    double stop_position[3];
+    double stop_velocity[3];
     double last_position[3];
     double last_velocity[3];
-    double position[3];
-    double velocity[3];
     double start_time;
     double stop_time;
-    double last_time;
+    double previous_time;
 
     if (start)
         start_time = start->get_time();
@@ -442,7 +446,8 @@ int Path::check(double epsilon)
         return error_count;
     }
 
-    last_time = start_time;
+    previous_time = start_time;
+
     vector<Pathlet*>::iterator p;
     for (p = pathlets.begin(); p != pathlets.end(); p++)
     {
@@ -471,7 +476,7 @@ int Path::check(double epsilon)
             return error_count;
         }
 
-        if (pathlet_start_time > pathlet_stop_time)
+        if (pathlet_start_time > stop_time)
         {
             error_count++;
             cerr << "Pathlet start time is after stop time." << endl
@@ -480,83 +485,8 @@ int Path::check(double epsilon)
                 << "Can't continue." << endl;
             return error_count;
         }
-        pathlet->get_position(pathlet_start_time, position);
-        pathlet->get_velocity(pathlet_start_time, velocity);
-        if (p == pathlets.begin())
-        {
-            if (pathlet_start_time != start_time)
-            {
-                error_count++;
-                cerr << "The first sample start time "
-                    << "does not match the path start time." << endl
-                    << "First Sample start time is " << start << " sec and "
-                    << "Path start time is " << start_time << " sec." << endl;
-            }
-        }
-        else
-        {
-            if (pathlet_start_time != last_time)
-            {
-                error_count++;
-                cerr << "Sample " << /*i <<*/ " start time "
-                    << "does not match the previous samples end time." << endl
-                    << "Sample start time is " << pathlet_start_time << " sec and "
-                    << "previous sample stop time was " 
-                    << last_time << " sec." << endl
-                    << "difference is " << pathlet_start_time - last_time << endl;
-            }
-            else
-            {
-                double position_error_count = 0;
-                for (int j = 0; j < 3; j++)
-                {
-                    double d = position[j] - last_position[j];
-                    //if (abs(d) > epsilon)
-                    if (d > epsilon or -d > epsilon)
-                        position_error_count++;
-                }
-                if (position_error_count)
-                {
-                    error_count++;
-                    cerr << "Sample start position did not match "
-                        << "previous sample end position." << endl;
-                    cerr << "Sample start position is " << "(" 
-                        << position[0] << ", "
-                        << position[1] << ", "
-                        << position[2] << ")." << endl;
-                    cerr << "Previous sample end position was " << "(" 
-                        << last_position[0] << ", "
-                        << last_position[1] << ", "
-                        << last_position[2] << ")." << endl;
-                    cerr << endl;
-                }
 
-                double velocity_error_count = 0;
-                for (int j = 0; j < 3; j++)
-                {
-                    double d = velocity[j] - last_velocity[j];
-                    if (d > epsilon or -d > epsilon)
-                        velocity_error_count++;
-                }
-                if (velocity_error_count)
-                {
-                    error_count++;
-                    cerr << "Sample start velocity did not match "
-                        << "previous sample end position." << endl;
-                    cerr << "Sample start velocity is " << "(" 
-                        << velocity[0] << ", "
-                        << velocity[1] << ", "
-                        << velocity[2] << ")." << endl;
-                    cerr << "Previous sample end velocity was " << "(" 
-                        << last_velocity[0] << ", "
-                        << last_velocity[1] << ", "
-                        << last_velocity[2] << ")." << endl;
-                    cerr << endl;
-                }
-            }
-        }
-
-        if (pathlet_stop_time < pathlet_start_time)
+        if (pathlet_stop_time < start_time)
         {
             error_count++;
             cerr << "Pathlet stop time is before start time." << endl
@@ -565,21 +495,91 @@ int Path::check(double epsilon)
                 << "Can't continue." << endl;
             return error_count;
         }
-        pathlet->get_position(pathlet_stop_time, last_position);
-        pathlet->get_velocity(pathlet_stop_time, last_velocity);
-        if (p == pathlets.end())
+
+        if ((p == pathlets.begin()) and (pathlet_start_time != start_time))
         {
-            if (pathlet_stop_time != stop_time)
+            error_count++;
+            cerr << "The first sample start time "
+                << "does not match the path start time." << endl
+                << "First Sample start time is " << start << " sec and "
+                << "Path start time is " << start_time << " sec." << endl;
+        }
+
+        if ((p == pathlets.end()) and (pathlet_stop_time != stop_time))
+        {
+            error_count++;
+            cerr << "The last pathlet in the path stop time "
+                << "does not match the path stop time." << endl
+                << "The last pathlet in the path stop time is " << pathlet_stop_time << " sec and "
+                << "the path stop time is " << stop_time << " sec." << endl;
+        }
+
+        if (pathlet_start_time != previous_time)
+        {
+            error_count++;
+            cerr << "Sample " << /*i <<*/ " start time "
+                << "does not match the previous samples end time." << endl
+                << "Sample start time is " << pathlet_start_time << " sec and "
+                << "previous sample stop time was " 
+                << previous_time << " sec." << endl
+                << "difference is " << pathlet_start_time - previous_time << endl;
+        }
+        else
+        {
+            pathlet->get_position(previous_time, last_position);
+            pathlet->get_velocity(previous_time, last_velocity);
+            pathlet->get_position(pathlet_start_time, start_position);
+            pathlet->get_position(pathlet_stop_time, stop_position);
+            double position_error_count = 0;
+            for (int j = 0; j < 3; j++)
+            {
+                double d = start_position[j] - last_position[j];
+                if (d > epsilon or -d > epsilon)
+                    position_error_count++;
+            }
+            if (position_error_count)
             {
                 error_count++;
-                cerr << "the last sample stop time "
-                    << "does not match the path stop time." << endl
-                    << "Last sample stop time is " << pathlet_stop_time << " sec and "
-                    << "Path stop time is " << stop_time << " sec." << endl;
+                cerr << "Pathlet "<<i<<" start position does not match "
+                    << "previous pathlet stop position." << endl;
+                cerr << "Current pathlet start position is " << "(" 
+                    << start_position[0] << ", "
+                    << start_position[1] << ", "
+                    << start_position[2] << ")." << endl;
+                cerr << "Previous pathlet stop position was " << "(" 
+                    << last_position[0] << ", "
+                    << last_position[1] << ", "
+                    << last_position[2] << ")." << endl;
+            }
+
+            pathlet->get_velocity(pathlet_start_time, start_velocity);
+            pathlet->get_velocity(pathlet_stop_time, stop_velocity);
+            double velocity_error_count = 0;
+            for (int j = 0; j < 3; j++)
+            {
+                double d = start_velocity[j] - last_velocity[j];
+                if (d > epsilon or -d > epsilon)
+                    velocity_error_count++;
+            }
+            if (velocity_error_count)
+            {
+                error_count++;
+                cerr << "Pathlet "<<i<<" start velocity does not match "
+                    << "previous pathlet stop position." << endl;
+                cerr << "Current pathlet start velocity is " << "(" 
+                    << start_velocity[0] << ", "
+                    << start_velocity[1] << ", "
+                    << start_velocity[2] << ")." << endl;
+                cerr << "Previous pathlet stop velocity was " << "(" 
+                    << last_velocity[0] << ", "
+                    << last_velocity[1] << ", "
+                    << last_velocity[2] << ")." << endl;
             }
         }
-        last_time = pathlet_stop_time;
+
+        previous_time = pathlet_stop_time;
     }
+
     if (error_count > 0)
     {
         cerr << "There were " << error_count << " errors with "
