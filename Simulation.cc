@@ -340,7 +340,7 @@ void Simulation::writeMathematicaGraphics(ostream &out, double start_write_time,
     {
         Path* path = *p;
         path->writeMathematicaGraphics(out, start_write_time, stop_write_time);
-        out << ", " << endl;
+        //out << ", " << endl;
     }
     out << "PlotRange -> {{-6, 6}, {-6,6}, {-6, 6}}" << endl;
     out << "]" << endl;
