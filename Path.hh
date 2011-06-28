@@ -104,11 +104,14 @@ class Path
     void hide();
     bool visable();
 
+
     //unsigned add(const Pathlet &_segment);
     unsigned discontinuities();
 	void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time);
 	void writeJSON(ostream &out, double start_write_time, double stop_write_time);
 
+  private:
+    int compare_vectors(double a[3], const double b[3], double c);
 };
 
 

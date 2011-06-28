@@ -412,6 +412,18 @@ return maximum;
 }
  */
 
+int Path::compare_vectors(double a[3], const double b[3], double c)
+{
+    double error_count = 0;
+    for (int j = 0; j < 3; j++)
+    {
+        double d = a[j] - b[j];
+        if (d > c or -d > c)
+            error_count++;
+    }
+    return error_count;
+}
+
 // tests a particle paths continuity
 // reports number of errors
 int Path::check(double epsilon)
@@ -530,6 +542,7 @@ int Path::check(double epsilon)
             pathlet->get_velocity(previous_time, last_velocity);
             pathlet->get_position(pathlet_start_time, start_position);
             pathlet->get_position(pathlet_stop_time, stop_position);
+            /*
             double position_error_count = 0;
             for (int j = 0; j < 3; j++)
             {
@@ -538,6 +551,8 @@ int Path::check(double epsilon)
                     position_error_count++;
             }
             if (position_error_count)
+            */
+            if (compare_vectors(start_position, last_position, epsilon))
             {
                 error_count++;
                 cerr << "Pathlet "<<i<<" start position does not match "
@@ -554,6 +569,7 @@ int Path::check(double epsilon)
 
             pathlet->get_velocity(pathlet_start_time, start_velocity);
             pathlet->get_velocity(pathlet_stop_time, stop_velocity);
+            /*
             double velocity_error_count = 0;
             for (int j = 0; j < 3; j++)
             {
@@ -562,6 +578,8 @@ int Path::check(double epsilon)
                     velocity_error_count++;
             }
             if (velocity_error_count)
+            */
+            if (compare_vectors(start_velocity, last_velocity, epsilon))
             {
                 error_count++;
                 cerr << "Pathlet "<<i<<" start velocity does not match "
@@ -575,6 +593,32 @@ int Path::check(double epsilon)
                     << last_velocity[1] << ", "
                     << last_velocity[2] << ")." << endl;
             }
+
+            double vertex_start_position[3];
+            double vertex_stop_position[3];
+            double vertex_start_out[3];
+            double vertex_stop_in[3];
+
+            pathlet_start->get_position(vertex_start_position);
+            //if (vertex_start_position, start_postion)
+            if (compare_vectors(vertex_start_position, start_position, epsilon))
+            {
+                error_count++;
+                cerr << "Pathlet "<<i<<" start position does not match "
+                    << "start Vertex position." << endl;
+            }
+
+            pathlet_start->get_out(vertex_start_out);
+            //if (pathlet_stop->pos... != start_postion)
+            if (compare_vectors(vertex_start_out, start_velocity, epsilon))
+            {
+                error_count++;
+                cerr << "Pathlet "<<i<<" start position does not match "
+                    << "start Vertex position." << endl;
+            }
+            pathlet_stop->get_position(vertex_stop_position);
+            pathlet_stop->get_in(vertex_stop_in);
+
         }
 
         previous_time = pathlet_stop_time;

@@ -16,13 +16,13 @@ class Pathlet;
  */
 class Vertex 
 {
-public:
 	double position[3];
 	double in[3];
 	double out[3];
 	Pathlet* before;
 	Pathlet* after;
 	unsigned order;
+	Event* event;
 
     enum vertexType {
         continuous,
@@ -33,8 +33,6 @@ public:
         interacting
     };
 
-private:
-	Event* event;
 	
 public:
 	//Vertex(double _time, const double x[3], const double v[3]);
@@ -44,7 +42,8 @@ public:
 
     double get_time();
 	double get_position(int i);
-	void set_position(double x[3]);
+	void get_position(double x[3]);
+	void set_position(const double x[3]);
 	double get_in(int i);
 	double get_out(int i);
 	void get_in(double p[3]);

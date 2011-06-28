@@ -60,7 +60,13 @@ double Vertex::get_position(int i)
     return position[i];
 }
 
-void Vertex::set_position(double x[3])
+void Vertex::get_position(double x[3])
+{
+    for (int i=0; i<3; i++)
+        x[i] = position[i];
+}
+
+void Vertex::set_position(const double x[3])
 {
     for (int i=0; i<3; i++)
         position[i] = x[i];
