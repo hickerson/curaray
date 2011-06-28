@@ -54,6 +54,8 @@ public:
 
 	~InteractionEvent() {};
 
+    void redirect_vertex(Vertex* vertex);
+
 /*
 	void set_normal(const double n[3]) 
 	{
@@ -63,14 +65,13 @@ public:
 */
 	
 private:
-/*
-	void reflect_velocity()
+	void reflect_velocity(double in[3], double out[3])
 	{ 
     	double vn = dot(in, normal);
     	for (unsigned i = 0; i < 3; i++)
     		out[i] -= 2*vn*normal[i];
 	}
-*/
+
 	virtual void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time);
 };
 #endif
