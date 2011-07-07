@@ -266,7 +266,7 @@ public:
     friend ostream& operator<< (ostream& out, const polynomial& p)
     {
         for (int n = p._degree; n > 0; n--)
-            out << p._c[n] << "*x^" << n << " + ";
+            out << "(" << p._c[n] << ")*x^" << n << " + ";
         out << p._c[0];
         return out;
     }

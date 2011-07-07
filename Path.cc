@@ -2,6 +2,7 @@
 #include "Vertex.hh"
 #include "Event.hh"
 #include <assert.h>
+#include <math.h>
 
 
 // TODO a vertex stuff
@@ -46,20 +47,21 @@ void Path::append(polynomial p[3], Event* event)
 */
 
 //void Path::append(polynomial p[3], Vertex* vertex)
-void Path::append(Pathlet* pathlet, Vertex* vertex)
+void Path::append(Pathlet* pathlet, Vertex* new_stop)
 {
 	assert(pathlet);
-	assert(vertex);
+	assert(new_stop);
 	pathlets.push_back(pathlet);
-	verticies.push_back(vertex);
+	verticies.push_back(new_stop);
 
 	pathlet->start = stop;
     stop->set_after(pathlet);
 
-	pathlet->stop = vertex;
-    vertex->set_before(0);
+	pathlet->stop = new_stop;
+	stop = new_stop;
 
-	stop = vertex;
+    new_stop->set_before(pathlet);
+    new_stop->set_after(0);
 }
 
 /*
@@ -417,8 +419,8 @@ int Path::compare_vectors(double a[3], const double b[3], double c)
     double error_count = 0;
     for (int j = 0; j < 3; j++)
     {
-        double d = a[j] - b[j];
-        if (d > c or -d > c)
+        double d = fabs(a[j] - b[j]);
+        if (d > c)
             error_count++;
     }
     return error_count;
@@ -613,8 +615,8 @@ int Path::check(double epsilon)
             if (compare_vectors(vertex_start_out, start_velocity, epsilon))
             {
                 error_count++;
-                cerr << "Pathlet "<<i<<" start position does not match "
-                    << "start Vertex position." << endl;
+                cerr << "Pathlet "<<i<<" start velocity does not match "
+                    << "start Vertex velocity." << endl;
             }
             pathlet_stop->get_position(vertex_stop_position);
             pathlet_stop->get_in(vertex_stop_in);

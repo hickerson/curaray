@@ -317,6 +317,7 @@ void Simulation::writeMathematicaGraphics(ostream &out)
 
 void Simulation::writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time)
 {
+    out << fixed;
     out << "Show[" << endl;
 
     vector<Source*>::iterator s;

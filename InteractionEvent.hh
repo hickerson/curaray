@@ -69,7 +69,7 @@ private:
 	{ 
     	double vn = dot(in, normal);
     	for (unsigned i = 0; i < 3; i++)
-    		out[i] -= 2*vn*normal[i];
+    		out[i] = 2*vn*normal[i] - in[3];
 	}
 
 	virtual void writeMathematicaGraphics(ostream &out, double start_write_time, double stop_write_time);

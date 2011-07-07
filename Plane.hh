@@ -164,7 +164,7 @@ Plane<n,k>::selfinteract(Pathlet* pathlet, double start_time, double stop_time) 
         q *= normal[i];
         p += q;
     }
-    p -= nc; // no longer needed
+    //p -= nc; // no longer needed
     p <<= 1;
 
     double* root = new double[p.get_degree()];
