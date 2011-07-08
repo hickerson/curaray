@@ -414,7 +414,7 @@ return maximum;
 }
  */
 
-int Path::compare_vectors(double a[3], const double b[3], double c)
+int Path::compare_vectors(const double a[3], const double b[3], double c)
 {
     double error_count = 0;
     for (int j = 0; j < 3; j++)
@@ -430,6 +430,7 @@ int Path::compare_vectors(double a[3], const double b[3], double c)
 // reports number of errors
 int Path::check(double epsilon)
 {
+    cout << "Checking path for error up to " << epsilon << "..." << endl;
     int error_count = 0;
     int i = 0;
     double start_position[3];
@@ -538,22 +539,11 @@ int Path::check(double epsilon)
                 << previous_time << " sec." << endl
                 << "difference is " << pathlet_start_time - previous_time << endl;
         }
-        else
+        else if (p != pathlets.begin())
         {
-            pathlet->get_position(previous_time, last_position);
-            pathlet->get_velocity(previous_time, last_velocity);
             pathlet->get_position(pathlet_start_time, start_position);
             pathlet->get_position(pathlet_stop_time, stop_position);
-            /*
-            double position_error_count = 0;
-            for (int j = 0; j < 3; j++)
-            {
-                double d = start_position[j] - last_position[j];
-                if (d > epsilon or -d > epsilon)
-                    position_error_count++;
-            }
-            if (position_error_count)
-            */
+
             if (compare_vectors(start_position, last_position, epsilon))
             {
                 error_count++;
@@ -571,16 +561,7 @@ int Path::check(double epsilon)
 
             pathlet->get_velocity(pathlet_start_time, start_velocity);
             pathlet->get_velocity(pathlet_stop_time, stop_velocity);
-            /*
-            double velocity_error_count = 0;
-            for (int j = 0; j < 3; j++)
-            {
-                double d = start_velocity[j] - last_velocity[j];
-                if (d > epsilon or -d > epsilon)
-                    velocity_error_count++;
-            }
-            if (velocity_error_count)
-            */
+
             if (compare_vectors(start_velocity, last_velocity, epsilon))
             {
                 error_count++;
@@ -596,6 +577,11 @@ int Path::check(double epsilon)
                     << last_velocity[2] << ")." << endl;
             }
 
+            pathlet->get_position(previous_time, last_position);
+            pathlet->get_velocity(previous_time, last_velocity);
+
+
+            // now check that the vectors match with the paths
             double vertex_start_position[3];
             double vertex_stop_position[3];
             double vertex_start_out[3];

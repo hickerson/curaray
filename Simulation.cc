@@ -274,7 +274,7 @@ bool Simulation::run(double start_time, double stop_time)
         best_event->redirect_vertex(vertex);
         path->append(pathlet, vertex);
 
-        int err_count = path->check(0.01);
+        int err_count = path->check(0.00001);
         if (err_count)
         {
             cerr << "Error appending new event to path." << endl;

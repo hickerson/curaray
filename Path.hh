@@ -111,7 +111,7 @@ class Path
 	void writeJSON(ostream &out, double start_write_time, double stop_write_time);
 
   private:
-    int compare_vectors(double a[3], const double b[3], double c);
+    int compare_vectors(const double a[3], const double b[3], double c);
 };
 
 
