@@ -20,6 +20,7 @@ Vertex::Vertex(double _time, const double x[3], const double v[3])
 
 Vertex::Vertex(Event* _event, const double x[3], const double v[3])
 {
+    assert(event);
     event = _event;
     before = 0;
     after = 0;
@@ -27,7 +28,7 @@ Vertex::Vertex(Event* _event, const double x[3], const double v[3])
     for (unsigned k = 0; k < 3; k++)
     {
         position[k] = x[k];
-        in[k] = v[k];
+        in[k] = 0;
         out[k] = v[k];
     }
 }
@@ -35,6 +36,7 @@ Vertex::Vertex(Event* _event, const double x[3], const double v[3])
 //Vertex::Vertex(Event* _event , Pathlet* _before, Pathlet* _after) 
 Vertex::Vertex(Event* _event , Pathlet* _before) 
 {
+    assert(_event);
     event = _event;
     before = _before;
     after = 0;
@@ -44,8 +46,12 @@ Vertex::Vertex(Event* _event , Pathlet* _before)
         double time = event->time;
         before->get_position(time, position);
         before->get_velocity(time, in);
-        before->get_velocity(time, out);
-        //event->set_position(in);
+        //before->get_velocity(time, out);
+    }
+    else 
+    {
+        cerr << "Could not assign before Pathlet" << endl;
+        exit(1);
     }
 }
 

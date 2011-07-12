@@ -56,6 +56,7 @@ double Simulation::get_field_acceleration(Vertex* vertex, int axis)
 // generate the next Pathlet from the event using fields
 Pathlet* Simulation::solve_pathlet(Vertex *start)
 {
+    assert(start);
     // TODO separate polynomial solutions from Runge-Kutta
     polynomial p[3]; // TODO make dimensionality a parameter
     for (int axis = 0; axis < 3; axis++) // TODO make dimensionality a parameter
@@ -73,11 +74,11 @@ Pathlet* Simulation::solve_pathlet(Vertex *start)
         }
         else if (degree == 1) // TODO check non-negative 
         {
-            double c[2] = {
-                start->get_position(axis), // TODO move outside
-                start->get_out(axis)  // TODO move outside
-            };
-            if (c[1] == 0) exit(0); // not sure what the point of this is ...
+            double c[2];
+            c[0] = start->get_position(axis); // TODO move outside
+            c[1] = start->get_out(axis);  // TODO move outside
+            if (c[1] == 0) 
+                exit(0); // not sure what the point of this is ... and yet... its not working...
             p[axis] = polynomial(1,c);
         }
         else
