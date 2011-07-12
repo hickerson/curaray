@@ -34,6 +34,10 @@ Vertex::Vertex(Event* _event, const double x[3], const double v[3])
 }
 
 //Vertex::Vertex(Event* _event , Pathlet* _before, Pathlet* _after) 
+
+/** 
+  Creates a `Vertex` at the end of a `Pathlet` from an `Event`
+  */
 Vertex::Vertex(Event* _event , Pathlet* _before) 
 {
     assert(_event);
@@ -46,7 +50,10 @@ Vertex::Vertex(Event* _event , Pathlet* _before)
         double time = event->time;
         before->get_position(time, position);
         before->get_velocity(time, in);
-        //before->get_velocity(time, out);
+        before->get_velocity(time, out);
+        cout << position[0] << endl;
+        cout << in[0] << endl;
+        cout << out[0] << endl;
     }
     else 
     {
