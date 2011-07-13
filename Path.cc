@@ -193,6 +193,8 @@ Pathlet::Pathlet(polynomial p[3], Vertex* _start, Vertex* _stop)
   : start(_start), stop(_stop), 
     scale(1) // default for now
 {
+    cout << start << endl;
+    cout << stop << endl;
 	for (int i = 0; i < 3; i++)
 		curve[i] = p[i];
 }
