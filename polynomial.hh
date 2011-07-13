@@ -158,8 +158,12 @@ public:
 
     polynomial& operator<<=(int s)
     {
-        _degree -= s;
-        double* __c = new double[_degree + 1 - s];
+        if (s >= _degree)
+            _degree -= s;
+        else
+            _degree = 0;
+        //double* __c = new double[_degree + 1 - s];
+        double* __c = new double[_degree + 1];
         for (int i = 0; i <= _degree; i++)
             __c[i] = _c[i + s];
 
