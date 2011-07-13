@@ -20,7 +20,7 @@ Vertex::Vertex(double _time, const double x[3], const double v[3])
 
 Vertex::Vertex(Event* _event, const double x[3], const double v[3])
 {
-    assert(event);
+    assert(_event);
     event = _event;
     before = 0;
     after = 0;

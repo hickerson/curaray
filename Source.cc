@@ -27,8 +27,9 @@ Vertex* Source::create_vertex(double start, double stop) const
     for(int i=0; i<3; i++) // TODO support dimension
         v[i] /= particle->mass;
 
-    //return new CreationEvent(t, x, v);
-    return new Vertex(new CreationEvent(t,geometry), x, v);
+    CreationEvent *ce = new CreationEvent(t,geometry);
+    assert(ce);
+    return new Vertex(ce, x, v);
 }
 
 double Source::get_strength(double start_time, double stop_time)
