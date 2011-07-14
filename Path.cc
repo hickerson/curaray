@@ -579,8 +579,6 @@ int Path::check(double epsilon)
                     << last_velocity[2] << ")." << endl;
             }
 
-            pathlet->get_position(previous_time, last_position);
-            pathlet->get_velocity(previous_time, last_velocity);
 
 
             // now check that the vectors match with the paths
@@ -590,7 +588,6 @@ int Path::check(double epsilon)
             double vertex_stop_in[3];
 
             pathlet_start->get_position(vertex_start_position);
-            //if (vertex_start_position, start_postion)
             if (compare_vectors(vertex_start_position, start_position, epsilon))
             {
                 error_count++;
@@ -599,18 +596,32 @@ int Path::check(double epsilon)
             }
 
             pathlet_start->get_out(vertex_start_out);
-            //if (pathlet_stop->pos... != start_postion)
             if (compare_vectors(vertex_start_out, start_velocity, epsilon))
             {
                 error_count++;
                 cerr << "Pathlet "<<i<<" start velocity does not match "
                     << "start Vertex velocity." << endl;
             }
-            pathlet_stop->get_position(vertex_stop_position);
-            pathlet_stop->get_in(vertex_stop_in);
 
+            pathlet_stop->get_position(vertex_stop_position);
+            if (compare_vectors(vertex_stop_position, stop_position, epsilon))
+            {
+                error_count++;
+                cerr << "Pathlet "<<i<<" stop position does not match "
+                    << "stop Vertex position." << endl;
+            }
+
+            pathlet_stop->get_in(vertex_stop_in);
+            if (compare_vectors(vertex_stop_in, stop_velocity, epsilon))
+            {
+                error_count++;
+                cerr << "Pathlet "<<i<<" stop velocity does not match "
+                    << "stop Vertex velocity." << endl;
+            }
         }
 
+        pathlet->get_position(previous_time, last_position);
+        pathlet->get_velocity(previous_time, last_velocity);
         previous_time = pathlet_stop_time;
     }
 
